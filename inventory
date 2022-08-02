@@ -17,5 +17,5 @@ p4 ansible_host=172.19.181.4 kubernetes_role=node
 [bramble:vars]
 ansible_ssh_user=pi
 ansible_ssh_password=Sufech00!
-deploy_target=pi
+; deploy_target=pi
 ; kubernetes_apiserver_advertise_address=10.0.100.61
