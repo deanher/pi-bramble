@@ -1,0 +1,31 @@
+---
+# Mapping of what hardware MAC addresses should be configured with specific IPs.
+mac_address_mapping:
+  "b8:27:eb:9e:a6:ca":
+    name: cnat.pidramble.com
+    ip: "10.0.100.60"
+  "00:22:82:ff:ff:01":
+    name: p1.pidramble.com
+    ip: "10.0.100.61"
+  "00:22:82:ff:ff:02":
+    name: p2.pidramble.com
+    ip: "10.0.100.62"
+  "00:22:82:ff:ff:03":
+    name: p3.pidramble.com
+    ip: "10.0.100.63"
+  "00:22:82:ff:ff:04":
+    name: p4.pidramble.com
+    ip: "10.0.100.64"
+  "b8:27:eb:2c:7e:b6":
+    name: p5.pidramble.com
+    ip: "10.0.100.65"
+  "b8:27:eb:11:af:f0":
+    name: p6.pidramble.com
+    ip: "10.0.100.66"
+
+# Nameservers to use in resolv.conf.
+dns_nameservers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+dramble_ip_gateway: "10.0.100.1"
