@@ -9,5 +9,5 @@ ff02::2   ip6-allrouters
 
 {# Add an entry for each host in the cluster, using the loop index to map IPs #}
 {% for host in groups['dramble'] %}
-10.0.100.{{ 60 + loop.index0 }} kube{{ loop.index0 }} kube{{ loop.index0 }}.pidramble.com
+192.168.179.{{ 60 + loop.index0 }} kube{{ loop.index0 }} kube{{ loop.index0 }}.pidramble.com
 {% endfor %}
