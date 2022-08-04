@@ -48,4 +48,22 @@ slaac private
 
 # A hook script is provided to lookup the hostname if not set by the DHCP
 # server, but it should not be run by default.
-nohook lookup-hostname
+#nohook lookup-hostname
+
+#ClusterCTRL
+reboot 15
+denyinterfaces ethpi* ethupi* ethupi*.10 brint usb0.10 eth0
+
+profile clusterctrol_fallback_usb0
+static ip_address=172.19.181.253/24
+static routers=172.19.181.254
+static domain_name_servers=8.8.8.8 208.67.222.222
+
+profile clusterctrl_fallback_br0
+static ip_address=172.19.181.254/24
+
+interface usb0
+fallback clusterctrl_fallback_usb0
+
+interface br0
+fallback clusterctrl_fallback_br0

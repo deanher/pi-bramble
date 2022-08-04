@@ -5,9 +5,15 @@ ff00::0   ip6-mcastprefix
 ff02::1   ip6-allnodes
 ff02::2   ip6-allrouters
 
-127.0.1.1 {{ dramble_hostname }}
+127.0.1.1   {{ dramble_hostname }}
 
 {# Add an entry for each host in the cluster, using the loop index to map IPs #}
-{% for host in groups['dramble'] %}
-192.168.179.{{ 60 + loop.index0 }} kube{{ loop.index0 }} kube{{ loop.index0 }}.pidramble.com
+{% for mapping in mac_address_mapping %}
+# Mapping for {{ mapping }}
+{{ mac_address_mapping[mapping].ip }} {{ mac_address_mapping[mapping].name.split('.')[0] }} {{ mac_address_mapping[mapping].name }}
 {% endfor %}
+
+#{# Add an entry for each host in the cluster, using the loop index to map IPs #}
+#{% for host in groups['dramble'] %}
+#172.19.181.{{ 60 + loop.index0 }} kube{{ loop.index0 }} kube{{ loop.index0 }}.pidramble.com
+#{% endfor %}

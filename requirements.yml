@@ -1,0 +1,12 @@
+---
+- hosts: cbridge
+  tasks:
+  - name: Update apt cache
+    apt:
+      update_cache: true
+    become: true
+  - name: Install sshpass
+    apt:
+      name: sshpass
+      state: latest
+    become: true
