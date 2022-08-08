@@ -8,6 +8,7 @@ p4      ansible_host=192.168.178.44   kubernetes_role=node
 cbridge ansible_host=192.168.178.36   kubernetes_role=master
 p5      ansible_host=192.168.178.39   kubernetes_role=node
 p6      ansible_host=192.168.178.40   kubernetes_role=node
+p7      ansible_host=192.168.178.49   kubernetes_role=node
 
 [bramble:vars]
 ansible_ssh_user=pi
