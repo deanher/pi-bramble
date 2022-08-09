@@ -1,12 +1,8 @@
 ---
-- hosts: cbridge
-  tasks:
-  - name: Update apt cache
-    apt:
-      update_cache: true
-    become: true
-  - name: Install sshpass
-    apt:
-      name: sshpass
-      state: latest
-    become: true
+- src: geerlingguy.security
+- src: geerlingguy.swap
+- src: geerlingguy.nfs
+- src: geerlingguy.pip
+- src: geerlingguy.containerd
+- src: geerlingguy.kubernetes
+- src: geerlingguy.k8s_manifests
