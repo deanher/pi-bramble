@@ -1,0 +1,36 @@
+---
+# global variables
+
+# ansible
+ansible_ssh_user: pi
+ansible_python_interpreter: /usr/bin/python3
+
+# setup
+ssh_folder: /home/pi/.ssh
+
+# kube
+deploy_target: pi
+kubernetes_apiserver_advertise_address: "{{ hostvars[k3s_master_node].ansible_host }}"
+
+# k3s configuration
+k3s_kube_config: /etc/rancher/k3s/k3s.yaml
+
+# containerd
+containerd_config_default_write: true
+# Only use with containerd_config_default_write: true
+containerd_config_cgroup_driver_systemd: false
+containerd_service_state: enabled
+containerd_service_enabled: false
+
+# Docker
+# Used only for Debian/Ubuntu. Switch 'stable' to 'nightly' if needed.
+docker_apt_release_channel: stable
+docker_apt_arch: '{{ (ansible_architecture == "aarch64") | ternary("arm64", "armhf") }}'
+docker_apt_dist: "{{ (ansible_architecture == 'aarch64') | ternary(ansible_distribution, 'Raspbian') | lower }}"
+docker_apt_repository: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ docker_apt_dist }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+docker_apt_ignore_key_error: true
+docker_apt_gpg_key: https://download.docker.com/linux/{{ docker_apt_dist }}/gpg
+
+# Docker registry
+docker_registry_domain: registry.picluster.test
+docker_registry_ingress_host: "{{ groups.registries[0] }}"

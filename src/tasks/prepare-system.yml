@@ -1,0 +1,140 @@
+---
+- name: Install sshpass locally
+  apt:
+    update_cache: true
+    name: sshpass
+    state: latest
+  delegate_to: localhost
+  delegate_facts: true
+  run_once: true
+  become: true
+
+- name: Extract local public key
+  shell: >
+    cat ~/.ssh/id_rsa.pub
+  register: pubkey
+  no_log: true
+  delegate_to: localhost
+  check_mode: false
+
+# - debug:
+#     var: pubkey
+
+- name: Create .ssh directory
+  file:
+    path: "{{ ssh_folder }}"
+    state: directory
+
+- name: Create empty "authorized_keys" file
+  file:
+    path: "{{ ssh_folder }}/authorized_keys"
+    state: touch
+  register: auth_keys_created
+
+- name: Add public key to authorized_keys
+  lineinfile:
+    path: "{{ ssh_folder }}/authorized_keys"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ pubkey.stdout_lines }}"
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Install "python3-pip"
+  apt:
+    update_cache: true
+    name: python3-pip
+    state: latest
+  register: python3_pip_installed
+  become: true
+
+- name: Install "git"
+  apt:
+    update_cache: true
+    name: git
+    state: latest
+  register: git_installed
+  become: true
+
+- name: Install "pexpect" pip plugin
+  pip:
+    name: pexpect
+  become: true
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Install "openshift" pip plugin
+  pip:
+    name: openshift
+  become: true
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Update apt cache and do full-upgrade
+  apt:
+    update_cache: true
+    upgrade: full
+  become: true
+
+- name: Install "brew"
+  expect: 
+    command: curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    responses:
+      (?i)password: "{{ ansible_become_pass }}"
+  when:
+    - (git_installed is changed) or (git_installed is succeeded)
+    - "'servers' in group_names"
+
+# - name: Execute "rpi-update"
+#   expect: 
+#     command: >
+#       rpi-update
+#     responses:
+#       question:
+#         - y
+#   become: true
+
+# - name: Install "snapd"
+#   apt:
+#     update_cache: true
+#     name: snapd
+#     state: latest
+#   register: snapd_installed
+#   become: true
+#   when: "{{ 'servers' in group_names }}"
+
+# - name: Reboot immediately if snapd is installed
+#   shell: "sleep 5 && reboot"
+#   async: 1
+#   poll: 0
+#   when:
+#     - snapd_installed is changed
+#     - not ansible_check_mode
+
+# - name: Wait for the reboot to complete after snapd is installed
+#   wait_for_connection:
+#     connect_timeout: 20
+#     sleep: 5
+#     delay: 5
+#     timeout: 300
+#   when:
+#     - snapd_installed is changed
+#     - not ansible_check_mode
+
+# - name: Execute "snap install core"
+#   shell: snap install core
+#   become: true
+#   when:
+#     - (snapd_installed is changed) or (snapd_installed is succeeded)
+#     - not ansible_check_mode
+
+# # https://github.com/golang/go/wiki/Ubuntu
+# - name: Execute "snap install go --classic"
+#   shell: snap install go --classic
+#   become: true
+#   when:
+#     - (snapd_installed is changed) or (snapd_installed is succeeded)
+#     - not ansible_check_mode

@@ -1,0 +1,58 @@
+---
+- name: Setup localhost
+  hosts: localhost
+  tasks:
+  - name: Install sshpass
+    apt:
+      update_cache: true
+      name: sshpass
+      state: latest
+      become: true
+    delegate_to: localhost
+    run_once: true
+
+  - name: Get local public key
+    shell: "cat ~/.ssh/id_rsa.pub"
+    register: pubkey
+    no_log: true
+    delegate_to: localhost
+    run_once: true
+
+- name: Setup nodes
+  hosts: all
+  tasks:  
+  - name: Create .ssh directory
+    file:
+      path: "{{ ssh_folder }}"
+      state: directory
+  - name: Create empty authorized_keys file
+    file:
+      path: "{{ ssh_folder }}/authorized_keys"
+      state: touch
+  - name: Add localhost key to authorized_keys
+    lineinfile:
+      path: "{{ ssh_folder }}/authorized_keys"
+      line: "{{ item }}"
+      state: present
+    with_items:
+      - "{{ pubkey.stdout_lines }}"
+  - name: Install python3-pip
+    apt:
+      update_cache: true
+      name: python3-pip
+      state: latest
+    become: true
+  - name: Install openshift pip plugin
+    pip:
+      name: openshift
+    become: true
+  - name: Install python3-pip
+    apt:
+      update_cache: true
+      name: python3-pip
+      state: latest
+    become: true
+  - name: Install openshift pip plugin
+    pip:
+      name: openshift
+    become: true

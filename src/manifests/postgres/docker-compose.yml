@@ -1,0 +1,13 @@
+---
+services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD="{{ postgres_password }}"
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 9080:8080

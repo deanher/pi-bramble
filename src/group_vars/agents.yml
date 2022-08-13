@@ -1,0 +1,5 @@
+---
+# variables for workers group
+
+# k3s configuration
+k3s_master_node: "{{ groups.servers[0] }}"

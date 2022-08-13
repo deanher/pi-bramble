@@ -1,0 +1,32 @@
+---
+- name: Go go go!
+  hosts: all
+  vars_files: 
+    - secret.yml
+
+  pre_tasks:
+    - import_tasks: tasks/prepare-system.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/setup-docker.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/setup-containerd.yml
+      tags: ["always"]
+
+    - name: Set the master node IP.
+      set_fact:
+        kubernetes_master_ip: "{{ hostvars[k3s_master_node].ansible_host }}"
+      tags: ["always"]
+
+  tasks:
+    - include_tasks: tasks/setup-external-database.yml
+      tags: ["database"]
+      when: "'databases' in group_names"
+
+    - include_tasks: tasks/setup-docker-registry.yml
+      tags: ["registry"]
+      when: "'databases' in group_names"
+
+    - include_tasks: tasks/setup-k3s.yml
+      tags: ["k3s"]
