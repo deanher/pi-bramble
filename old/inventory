@@ -1,0 +1,25 @@
+[cluster]
+cbridge ansible_host=192.168.178.60   kubernetes_role=node
+p5      ansible_host=192.168.178.65   kubernetes_role=node
+p6      ansible_host=192.168.178.66   kubernetes_role=node
+p7      ansible_host=192.168.178.67   kubernetes_role=master
+
+[clusterzero]
+p1      ansible_host=192.168.178.61   kubernetes_role=node
+p2      ansible_host=192.168.178.62   kubernetes_role=node
+p3      ansible_host=192.168.178.63   kubernetes_role=node
+p4      ansible_host=192.168.178.64   kubernetes_role=node
+
+[cluster:vars]
+ansible_ssh_user=pi
+deploy_target=pi
+kubernetes_apiserver_advertise_address=192.168.178.67
+ansible_python_interpreter=/usr/bin/python3
+docker_apt_arch=arm64
+
+[clusterzero:vars]
+ansible_ssh_user=pi
+deploy_target=pi
+kubernetes_apiserver_advertise_address=192.168.178.67
+ansible_python_interpreter=/usr/bin/python3
+docker_apt_arch=armhf

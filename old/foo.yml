@@ -1,15 +1,15 @@
 ---
-- hosts: all
+- hosts: localhost
   tasks:
   - name: Create .ssh directory
     file:
-      path: "/home/pi/.ssh"
+      path: "/home/deanh/foo"
       state: directory
   - name: create empty file
     file:
-      path: "/home/pi/.ssh/authorized_keys"
+      path: "/home/deanh/foo/authorized_keys"
       state: touch
   - name: put pubkey
     lineinfile:
-      path: "/home/pi/.ssh/authorized_keys"
+      path: "/home/deanh/foo/authorized_keys"
       line: "{{ pubkey }}"

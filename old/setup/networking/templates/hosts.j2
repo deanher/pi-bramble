@@ -1,0 +1,19 @@
+127.0.0.1 localhost
+::1   localhost ip6-localhost ip6-loopback
+fe00::0   ip6-localnet
+ff00::0   ip6-mcastprefix
+ff02::1   ip6-allnodes
+ff02::2   ip6-allrouters
+
+127.0.1.1   {{ cluster_hostname }}
+
+{# Add an entry for each host in the cluster, using the loop index to map IPs #}
+{% for mapping in mac_address_mapping %}
+# Mapping for {{ mapping }}
+{{ mac_address_mapping[mapping].ip }} {{ mac_address_mapping[mapping].name.split('.')[0] }} {{ mac_address_mapping[mapping].name }}
+{% endfor %}
+
+#{# Add an entry for each host in the cluster, using the loop index to map IPs #}
+#{% for host in groups['cluster'] %}
+#172.19.181.{{ 60 + loop.index0 }} kube{{ loop.index0 }} kube{{ loop.index0 }}.picluster.com
+#{% endfor %}
