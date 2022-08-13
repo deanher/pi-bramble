@@ -3,26 +3,39 @@
   shell: >
     curl -sfL https://get.k3s.io | sh -s - server 
     --token={{ k3s_token }} 
-    --datastore-endpoints="postgres://postgres:{{ postgres_password }}@{{ postgres_host }}:5432/k3s" 
+    --datastore-endpoint="postgres://clusteruser:{{ postgres_password }}@{{ postgres_host }}:5432/k3s" 
     --tls-san={{ k3s_master_node }}
   when: "'servers' in group_names"
+  become: true
 
 - name: Setup k3s workers
   shell: >
     curl -sfL https://get.k3s.io | K3S_URL="https://{{ k3s_master_node }}:6443" K3S_TOKEN={{ k3s_token }} sh -
   when: "'agents' in group_names"
+  become: true
+  
+- name: Create "{{ docker_registry_manifest }}" directory
+  file:
+    path: "{{ docker_registry_manifest }}"
+    state: directory
+
+- name: Create "{{ docker_registry_manifest }}/manifests/docker-registry/manifest.yaml file
+  copy:
+    src: "{{ playbook_dir }}/manifests/docker-registry/manifest.yaml"
+    dest: "{{ docker_registry_manifest }}/manifest.yaml"
 
 - name: Setup k3s registry
   shell: >
-    kubectl apply -f {{ playbook_dir }}/manifests/docker-registry/manifest.yaml
+    k3s kubectl apply -f "{{ docker_registry_manifest }}/manifest.yaml"
   register: k8s_result
   until: k8s_result is success
   retries: 10
   delay: 2
-  # delegate_to: "{{ item }}"
-  # loop: "{{ groups.servers }}"
+  delegate_to: "{{ item }}"
+  loop: "{{ groups.servers }}"
   when: "'servers' in group_names"
   run_once: true
+  become: true
 
 - name: Create "registries.yaml"
   file:

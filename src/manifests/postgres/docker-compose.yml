@@ -4,7 +4,10 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_PASSWORD="{{ postgres_password }}"
+      - POSTGRES_USER=clusteruser
+      - POSTGRES_PASSWORD
+    ports: 
+      - 5432:5432
 
   adminer:
     image: adminer

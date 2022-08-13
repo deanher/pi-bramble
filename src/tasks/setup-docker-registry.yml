@@ -1,7 +1,7 @@
 ---
 - name: Check if Docker Registry cert already exists.
   stat:
-    path: "{{ playbook_dir }}/manifests/docker-registry/certs/tls.crt"
+    path: "{{ playbook_dir }}/manifests/docker-registry/cert/tls.crt"
   connection: local
   become: false
   run_once: true
@@ -10,8 +10,8 @@
 - name: Generate a cert and key for the Docker Registry.
   command: >
     openssl req -x509 -nodes -days 3650 -newkey rsa:2048
-    -keyout {{ playbook_dir }}/manifests/docker-registry/certs/tls.key
-    -out {{ playbook_dir }}/manifests/docker-registry/certs/tls.crt
+    -keyout {{ playbook_dir }}/manifests/docker-registry/cert/tls.key
+    -out {{ playbook_dir }}/manifests/docker-registry/cert/tls.crt
     -subj "/CN={{ docker_registry_domain}}"
   connection: local
   become: false
@@ -20,8 +20,8 @@
 
 - name: Set vars for Docker Registry certs (for all hosts).
   set_fact:
-    docker_registry_key: "{{ lookup('file', playbook_dir  + '/manifests/docker-registry/certs/tls.key') }}"
-    docker_registry_crt: "{{ lookup('file', playbook_dir  + '/manifests/docker-registry/certs/tls.crt') }}"
+    docker_registry_key: "{{ lookup('file', playbook_dir  + '/manifests/docker-registry/cert/tls.key') }}"
+    docker_registry_crt: "{{ lookup('file', playbook_dir  + '/manifests/docker-registry/cert/tls.crt') }}"
 
 - name: Add registry to hosts file.
   lineinfile:
@@ -30,14 +30,17 @@
     regexp: '.*{{ docker_registry_domain }}$'
     state: present
   when: deploy_target != 'docker'
+  become: true
 
 - name: Ensure Docker cert store directory exists.
   file:
     path: "/etc/docker/certs.d/{{ docker_registry_domain }}/"
     state: directory
     recurse: true
+  become: true
 
 - name: Copy Docker Registry cert into Docker cert store.
   copy:
-    src: "{{ playbook_dir }}/manifests/docker-registry/certs/tls.crt"
+    src: "{{ playbook_dir }}/manifests/docker-registry/cert/tls.crt"
     dest: "/etc/docker/certs.d/{{ docker_registry_domain }}/ca.crt"
+  become: true

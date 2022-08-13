@@ -5,6 +5,9 @@
     - secret.yml
 
   pre_tasks:
+    - import_tasks: tasks/cgroup-features.yml
+      tags: ["always"]
+
     - import_tasks: tasks/prepare-system.yml
       tags: ["always"]
 
@@ -32,7 +35,7 @@
 
     - include_tasks: tasks/setup-docker-registry.yml
       tags: ["registry"]
-      when: "'databases' in group_names"
+      when: "'registries' in group_names"
 
     - include_tasks: tasks/setup-k3s.yml
       tags: ["k3s"]
