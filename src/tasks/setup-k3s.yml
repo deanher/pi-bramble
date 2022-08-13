@@ -10,7 +10,7 @@
 - name: Setup k3s workers
   shell: >
     curl -sfL https://get.k3s.io | K3S_URL="https://{{ k3s_master_node }}:6443" K3S_TOKEN={{ k3s_token }} sh -
-  when: "{{ 'agents' in group_names }}"
+  when: "'agents' in group_names"
 
 - name: Setup k3s registry
   shell: >
@@ -31,7 +31,7 @@
   become: true
   # delegate_to: "{{ item }}"
   # loop: "{{ groups.servers }}"
-  when: "{{ 'servers' in group_names }}"
+  when: "'servers' in group_names"
   run_once: true
 
 - name: Add registry to "registries.yaml"

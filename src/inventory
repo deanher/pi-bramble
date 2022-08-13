@@ -1,9 +1,9 @@
 [cluster]
 p0 ansible_host=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
-p1 ansible_host=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
-p2 ansible_host=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
-p3 ansible_host=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
-p4 ansible_host=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
+#p1 ansible_host=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
+#p2 ansible_host=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
+#p3 ansible_host=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
+#p4 ansible_host=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
 p5 ansible_host=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
 p6 ansible_host=192.168.178.66 docker_apt_arch=arm64 kubernetes_role=agent
 p7 ansible_host=192.168.178.67 docker_apt_arch=arm64 kubernetes_role=server
@@ -13,10 +13,10 @@ p0 ansible_host=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
 p7 ansible_host=192.168.178.67 docker_apt_arch=arm64 kubernetes_role=server
 
 [agents]
-p1 ansible_host=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
-p2 ansible_host=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
-p3 ansible_host=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
-p4 ansible_host=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
+#p1 ansible_host=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
+#p2 ansible_host=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
+#p3 ansible_host=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
+#p4 ansible_host=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
 p5 ansible_host=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
 
 [databases]

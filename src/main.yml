@@ -8,6 +8,11 @@
     - import_tasks: tasks/prepare-system.yml
       tags: ["always"]
 
+    - import_tasks: tasks/setup-network.yml
+      when:
+        - ansible_distribution_version == "10"
+        - deploy_target != 'docker'
+
     - import_tasks: tasks/setup-docker.yml
       tags: ["always"]
 
@@ -18,6 +23,7 @@
       set_fact:
         kubernetes_master_ip: "{{ hostvars[k3s_master_node].ansible_host }}"
       tags: ["always"]
+      when: "'agents' in group_names"
 
   tasks:
     - include_tasks: tasks/setup-external-database.yml
@@ -30,3 +36,10 @@
 
     - include_tasks: tasks/setup-k3s.yml
       tags: ["k3s"]
+
+  handlers:
+    - name: Restart containerd
+      service:
+        name: containerd
+        state: restarted
+      listen: "restart containerd"

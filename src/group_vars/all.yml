@@ -14,12 +14,13 @@ kubernetes_apiserver_advertise_address: "{{ hostvars[k3s_master_node].ansible_ho
 
 # k3s configuration
 k3s_kube_config: /etc/rancher/k3s/k3s.yaml
+k3s_master_node: "{{ groups.servers[0] }}"
 
 # containerd
 containerd_config_default_write: true
 # Only use with containerd_config_default_write: true
 containerd_config_cgroup_driver_systemd: false
-containerd_service_state: enabled
+containerd_service_state: started
 containerd_service_enabled: false
 
 # Docker

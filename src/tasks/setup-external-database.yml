@@ -1,27 +1,28 @@
 ---
-- name: Create "{{ postgress_folder }}" directory
-  hosts: all
-  tasks:  
-  - name: Create .ssh directory
-    file:
-      path: "{{ postgress_folder }}"
-      state: directory
-
-- name: Create "{{ postgress_folder }}/{{ env_file_path }}" file
+- name: Create "{{ postgres_folder }}" directory
   file:
-    path: "{{ postgress_folder }}/{{ env_file_path }}"
-    state: touch
+    path: "{{ postgres_folder }}"
+    state: directory
 
-- name: Add environment variables to "{{ postgress_folder }}/{{ env_file_path }}"
-  lineinfile:
-    path: "{{ postgress_folder }}/{{ env_file_path }}"
-    line: "POSTGRES_PASSWORD={{ postgres_password }}"
-    state: present
+# - name: Create "{{ postgres_folder }}/{{ env_file_path }}" file
+#   file:
+#     path: "{{ postgres_folder }}/{{ env_file_path }}"
+#     state: touch
+
+# - name: Add environment variables to "{{ postgres_folder }}/{{ env_file_path }}"
+#   lineinfile:
+#     path: "{{ postgres_folder }}/{{ env_file_path }}"
+#     line: "POSTGRES_PASSWORD={{ postgres_password }}"
+#     state: present
+
+- name: Create "{{ postgres_folder }}/{{ env_file_path }}" file
+  copy:
+    src: "{{ postgres_folder }}/{{ env_file_path }}"
+    dest: "{{ postgres_folder }}/docker-compose.yml"
 
 - name: Compose postgres
   shell: >
     docker compose --project-name postgres
-    --env_file "{{ postgress_folder }}/{{ env_file_path }}"
-    -f "{{ playbook_dir}}/manifests/postgres/docker-compose.yml"
+    -f "{{ postgres_folder }}/docker-compose.yml"
     up -d
   become: true

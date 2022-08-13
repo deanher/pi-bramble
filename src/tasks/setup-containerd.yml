@@ -4,24 +4,28 @@
     name: containerd.io
     state: latest
   when: not ansible_check_mode
+  become: true
 
 - name: Ensure containerd is started and enabled at boot.
   service:
     name: containerd
     state: "{{ containerd_service_state }}"
     enabled: "{{ containerd_service_enabled }}"
+  become: true
 
 - name: Ensure containerd config directory exists.
   file:
     path: /etc/containerd
     state: directory
   register: containerd_dir
+  become: true
 
 - name: Get defaults from containerd.
   command: containerd config default
   changed_when: false
   register: containerd_config_default
   when: containerd_config_default_write
+  become: true
 
 - name: Prepare containerd/config.toml from default config
   copy:
@@ -29,6 +33,7 @@
     content: "{{ containerd_config_default.stdout }}"
   when: containerd_config_default_write
   changed_when: false
+  become: true
 
 # TODO: setup cgroups if necessary
 # - name: Set Cgroup driver to systemd
@@ -56,17 +61,20 @@
     dest: /etc/containerd/config.toml
   notify: restart containerd
   when: containerd_config_default_write
+  become: true
 
 - name: Cleanup temporary file
   file:
     path: /tmp/containerd_config.toml
     state: absent
   changed_when: false
+  become: true
 
 - name: Ensure containerd is restarted immediately if necessary.
   meta: flush_handlers
+  become: true
 
-- name: Install "nerdctl"
-  shell: >
-    brew install nerdctl
-  when: "'servers' in group_names"
+# - name: Install "nerdctl"
+#   shell: >
+#     brew install nerdctl
+#   when: "'servers' in group_names"

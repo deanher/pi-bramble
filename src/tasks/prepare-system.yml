@@ -79,14 +79,14 @@
     upgrade: full
   become: true
 
-- name: Install "brew"
-  expect: 
-    command: curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
-    responses:
-      (?i)password: "{{ ansible_become_pass }}"
-  when:
-    - (git_installed is changed) or (git_installed is succeeded)
-    - "'servers' in group_names"
+# - name: Install "brew"
+#   expect: 
+#     command: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+#     responses:
+#       (?i)password: "{{ ansible_become_pass }}"
+#   when:
+#     - (git_installed is changed) or (git_installed is succeeded)
+#     - "'servers' in group_names"
 
 # - name: Execute "rpi-update"
 #   expect: 
