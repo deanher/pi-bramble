@@ -3,7 +3,7 @@
   shell: >
     curl -sfL https://get.k3s.io | sh -s - server 
     --token={{ k3s_token }} 
-    --datastore-endpoint="postgres://clusteruser:{{ postgres_password }}@{{ postgres_host }}:5432/k3s" 
+    --datastore-endpoint="postgres://clusteruser:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode=disable"
     --tls-san={{ k3s_master_node }}
   when: "'servers' in group_names"
   become: true
@@ -14,28 +14,28 @@
   when: "'agents' in group_names"
   become: true
   
-- name: Create "{{ docker_registry_manifest }}" directory
-  file:
-    path: "{{ docker_registry_manifest }}"
-    state: directory
-
-- name: Create "{{ docker_registry_manifest }}/manifests/docker-registry/manifest.yaml file
-  copy:
-    src: "{{ playbook_dir }}/manifests/docker-registry/manifest.yaml"
-    dest: "{{ docker_registry_manifest }}/manifest.yaml"
-
-- name: Setup k3s registry
-  shell: >
-    k3s kubectl apply -f "{{ docker_registry_manifest }}/manifest.yaml"
-  register: k8s_result
-  until: k8s_result is success
-  retries: 10
-  delay: 2
-  delegate_to: "{{ item }}"
-  loop: "{{ groups.servers }}"
-  when: "'servers' in group_names"
-  run_once: true
-  become: true
+# - name: Create "{{ docker_registry_manifest }}" directory
+#   file:
+#     path: "{{ docker_registry_manifest }}"
+#     state: directory
+#
+# - name: Create "{{ docker_registry_manifest }}/manifests/docker-registry/manifest.yaml file
+#   copy:
+#     src: "{{ playbook_dir }}/manifests/docker-registry/manifest.yaml"
+#     dest: "{{ docker_registry_manifest }}/manifest.yaml"
+#
+# - name: Setup k3s registry
+#   shell: >
+#     k3s kubectl apply -f "{{ docker_registry_manifest }}/manifest.yaml"
+#   register: k8s_result
+#   until: k8s_result is success
+#   retries: 10
+#   delay: 2
+#   delegate_to: "{{ item }}"
+#   loop: "{{ groups.servers }}"
+#   when: "'servers' in group_names"
+#   run_once: true
+#   become: true
 
 - name: Create "registries.yaml"
   file:
@@ -45,7 +45,7 @@
   # delegate_to: "{{ item }}"
   # loop: "{{ groups.servers }}"
   when: "'servers' in group_names"
-  run_once: true
+#   run_once: true
 
 - name: Add registry to "registries.yaml"
   lineinfile:
@@ -57,23 +57,23 @@
   # loop: "{{ groups.servers }}"
   when: "'servers' in group_names"
   with_items:
-    - "mirrors:"
-    - "  {{ docker_registry_domain }}:"
-    - "    endpoint:"
-    - "      https://{{ docker_registry_domain }}"
-
-- name: Restart k3s-servers
-  service:
-    name: k3s
-    state: restarted
-    sleep: 5
-  become: true
-  when: "'servers' in group_names"
-
-- name: Restart k3s-agents
-  service:
-    name: k3s-agent
-    state: restarted
-    sleep: 5
-  become: true
-  when: "'agents' in group_names"
+    - 'mirrors:'
+    - '  {{ docker_registry_domain }}:'
+    - '    endpoint:'
+    - '      - "https://{{ docker_registry_domain }}:5000"'
+#
+# - name: Restart k3s-servers
+#   service:
+#     name: k3s
+#     state: restarted
+#     sleep: 5
+#   become: true
+#   when: "'servers' in group_names"
+#
+# - name: Restart k3s-agents
+#   service:
+#     name: k3s-agent
+#     state: restarted
+#     sleep: 5
+#   become: true
+#   when: "'agents' in group_names"

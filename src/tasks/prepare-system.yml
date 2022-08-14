@@ -1,6 +1,6 @@
 ---
 - name: Install sshpass locally
-  apt:
+  package:
     update_cache: true
     name: sshpass
     state: latest

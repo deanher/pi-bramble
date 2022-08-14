@@ -6,6 +6,8 @@ services:
     environment:
       - POSTGRES_USER=clusteruser
       - POSTGRES_PASSWORD
+    volumes:
+      - /home/pi/.postgres/data/:/var/lib/postgresql/data/
     ports: 
       - 5432:5432
 
