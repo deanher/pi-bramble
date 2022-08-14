@@ -61,7 +61,22 @@
     - '  {{ docker_registry_domain }}:'
     - '    endpoint:'
     - '      - "https://{{ docker_registry_domain }}:5000"'
-#
+
+- name: Fix server IP in "k3s.yaml"
+  lineinfile:
+    path: "{{ k3s_kube_config }}"
+    regexp: '127\.0\.0\.1'
+    # search_string: "127.0.0.1"
+    line: "    server: https://{{ hostvars[inventory_hostname].ansible_host }}:6443"
+    state: present
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+  become: true
+  # delegate_to: "{{ item }}"
+  # with_items: "{{ groups.servers }}"
+  when: "'servers' in group_names"
+
 # - name: Restart k3s-servers
 #   service:
 #     name: k3s

@@ -1,19 +1,23 @@
 ---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
 - name: Install sshpass locally
   package:
     update_cache: true
     name: sshpass
     state: latest
   delegate_to: localhost
-  delegate_facts: true
   run_once: true
   become: true
+  when: '"sshpass" not in ansible_facts.packages'
 
 - name: Extract local public key
   shell: >
     cat ~/.ssh/id_rsa.pub
   register: pubkey
-  no_log: true
+  no_log: false
   delegate_to: localhost
   check_mode: false
 
