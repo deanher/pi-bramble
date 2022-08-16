@@ -20,7 +20,7 @@
     sh "/home/{{ ansible_ssh_user }}/k3s_install.sh" server 
     --token {{ k3s_token }} 
     --datastore-endpoint "postgres://clusteruser:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode=disable"
-    --tls-san {{ hostvars[k3s_master_node].ansible_host }}
+    --tls-san {{ hostvars[k3s_master_node].host_name }}
   when: "'servers' in group_names"
   become: true
 
@@ -28,6 +28,6 @@
   shell: >
     sh "/home/{{ ansible_ssh_user }}/k3s_install.sh" agent 
     --token {{ k3s_token }}
-    --server "https://{{ hostvars[k3s_master_node].ansible_host }}:6443"
+    --server "https://{{ hostvars[k3s_master_node].host_name }}:6443"
   when: "'agents' in group_names"
   become: true
