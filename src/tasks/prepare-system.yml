@@ -17,7 +17,7 @@
   shell: >
     cat ~/.ssh/id_rsa.pub
   register: pubkey
-  no_log: false
+  no_log: true
   delegate_to: localhost
   check_mode: false
 
@@ -70,6 +70,15 @@
   pip:
     name: openshift
   become: true
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Install "fabric" pip plugin
+  pip:
+    name: fabric
+  become: true
+  delegate_to: "{{ groups.servers[0] }}"
   when:
     - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
     - not ansible_check_mode

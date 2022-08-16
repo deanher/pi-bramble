@@ -1,5 +1,5 @@
 [cluster]
-cbridge host_name=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
+masteri host_name=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
 p1 host_name=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
 ; p2 host_name=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
 p3 host_name=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
@@ -14,7 +14,7 @@ p7 host_name=192.168.178.67 docker_apt_arch=arm64 kubernetes_role=server
 
 [agents]
 p1 host_name=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
-; p2 host_name=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
+p2 host_name=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
 p3 host_name=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
 p4 host_name=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
 p5 host_name=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
