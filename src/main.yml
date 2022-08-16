@@ -5,11 +5,10 @@
     - secret.yml
 
   vars:
-    # ansible_python_interpreter: python
-    k8s_kubeconfig: /etc/rancher/k3s/k3s.yaml
+    k8s_kubeconfig: /etc/rancher/k3s/k3s.yaml #~/.kube/config-pi-cluster
     k8s_manage_namespace: false
     k8s_no_log: false
-    k8s_manifests_base_dir: manifests/
+    k8s_manifests_base_dir: "manifests/"
     k8s_manifests:
       - dir: docker-registry
         namespace: registry
@@ -40,25 +39,25 @@
 
   tasks:
     - include_tasks: tasks/setup-external-database.yml
-      tags: ["database"]
+      tags: ['k3s', 'database']
       when: "'databases' in group_names"
 
     - include_tasks: tasks/setup-docker-registry.yml
-      tags: ["registry"]
-      when: "'registries' in group_names"
+      tags: ['k3s', 'registry']
 
     - include_tasks: tasks/setup-k3s.yml
       tags: ["k3s"]
 
-    - import_tasks: tasks/k8s-config.yml
+    - include_tasks: tasks/k8s-config.yml
       tags: ['k3s']
 
     - import_role:
-        name: geerlingguy.k8s_manifests
+        name: deanh.k3s-manifests #geerlingguy.k8s_manifests
       tags: ['k3s', 'registry']
       when: "'servers' in group_names"
-#      delegate_to: "{{ groups.servers[0] }}"
-#      run_once: true
+      # delegate_to: "{{ k3s_master_node }}"
+      run_once: true
+      become: true
 
   handlers:
     - name: Restart containerd
@@ -66,4 +65,9 @@
         name: containerd
         state: restarted
       listen: "restart containerd"
-#      when: "'registries' in group_names"
+
+    - name: Restart k3s
+      service:
+        name: k3s
+        state: restarted
+      listen: "restart k3s"

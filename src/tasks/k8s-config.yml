@@ -1,4 +1,17 @@
 ---
+- name: Fix server IP in "k3s.yaml"
+  lineinfile:
+    path: "{{ k3s_kube_config }}"
+    regexp: '127\.0\.0\.1'
+    line: "    server: https://{{ hostvars[inventory_hostname].ansible_host }}:6443"
+    state: present
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+  notify: restart k3s
+  become: true
+  when: "'servers' in group_names"
+
 - name: Ensure ~/.kube directory exists.
   file:
     path: ~/.kube
@@ -10,7 +23,7 @@
 - name: Copy K8s config file from master to local.
   fetch:
     src: "/etc/rancher/k3s/k3s.yaml"
-    dest: "~/.kube/config-dramble-{{ deploy_target }}"
+    dest: "~/.kube/config-pi-cluster"
     flat: true
   delegate_to: "{{ k3s_master_node }}"
   run_once: true
@@ -20,15 +33,29 @@
   file:
     path: ~/.kube
     state: directory
-  when: "'agents' in group_names"
+  # when: "'agents' in group_names"
 
 - name: Copy K8s config file from master to nodes.
   copy:
-    src: "~/.kube/config-dramble-{{ deploy_target }}"
-    dest: "~/.kube/config"
+    src: "~/.kube/config-pi-cluster"
+    dest: "/home/{{ ansible_ssh_user }}/.kube/config"
     owner: "{{ ansible_ssh_user }}"
     group: "{{ ansible_ssh_user }}"
     mode: '0644'
-  # delegate_to: "{{ k3s_master_node }}"
-  when: "'agents' in group_names"
-  # run_once: true
+  # notify: restart k3s
+  # when: "'agents' in group_names"
+  become: true
+
+# - name: Restart k3s-servers
+#   service:
+#     name: k3s
+#     state: restarted
+#   become: true
+#   when: "'servers' in group_names"
+
+# - name: Restart k3s-agents
+#   service:
+#     name: k3s-agent
+#     state: restarted
+#   become: true
+#   when: "'agents' in group_names"

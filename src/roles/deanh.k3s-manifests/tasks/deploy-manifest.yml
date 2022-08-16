@@ -1,0 +1,51 @@
+---
+- name: Set variables for this iteration of the loop.
+  set_fact:
+    manifest_directory: "{{ k8s_manifests_base_dir }}{{ outer_item.dir | default(outer_item) }}"
+    manifest_directory_rel: "{{ outer_item.dir | default(outer_item) }}"
+    manifest_lookup_type: "{{ outer_item.lookup_type | default('fileglob') }}"
+    manifest_namespace: "{{ outer_item.namespace | default('') }}"
+
+- name: Include vars specific to this manifest.
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ manifest_directory }}/vars.yml"
+      skip: true
+
+- name: res
+  debug: msg="{{ item }}"
+  loop: "{{ lookup(manifest_lookup_type, manifest_directory + '/manifest.yml', wantlist=True) }}"
+
+- name: Deploy the resources defined inside the manifest.
+  # copy: 
+  #   content: "{{ item }}"
+  #   dest: "/var/lib/rancher/k3s/server/manifests/{{manifest_directory}}.yaml"
+  #   owner: root
+  #   group: root
+  #   mode: u=,g=,o=rw
+  template:
+    dest: "/var/lib/rancher/k3s/server/manifests/{{manifest_directory_rel}}.yaml"
+    src: "{{ item }}"
+    owner: root
+    group: root
+    mode: u=,g=,o=rw
+  # k8s:
+  #   definition: "{{ item }}"
+  #   kubeconfig: "{{ k8s_kubeconfig }}"
+  #   state: "{{ k8s_manifests_state }}"
+  #   force: "{{ k8s_force }}"
+  # loop: "{{ lookup(manifest_lookup_type, manifest_directory + '/manifest.yml') | from_yaml_all | list }}"
+  loop: "{{ lookup(manifest_lookup_type, manifest_directory + '/manifest.yml', wantlist=True) }}"
+  register: k8s_result
+  # until: k8s_result is success
+  # retries: 10
+  # delay: 2
+  no_log: "{{ k8s_no_log }}"
+  notify: restart k3s
+  become: true
+
+# - name: res
+#   debug:
+#     var: k8s_result
+  

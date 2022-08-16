@@ -33,6 +33,6 @@ docker_apt_ignore_key_error: true
 docker_apt_gpg_key: https://download.docker.com/linux/{{ docker_apt_dist }}/gpg
 
 # Docker registry
-docker_registry_domain: registry.picluster.test
+docker_registry_domain: registry.picluster.com
 docker_registry_ingress_host: "{{ groups.registries[0] }}"
 docker_registry_manifest: "/home/{{ ansible_ssh_user }}/.docker-registry"
