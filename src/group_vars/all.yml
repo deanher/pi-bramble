@@ -10,7 +10,7 @@ ssh_folder: /home/pi/.ssh
 
 # kube
 deploy_target: pi
-kubernetes_apiserver_advertise_address: "{{ hostvars[k3s_master_node].host_name }}"
+kubernetes_apiserver_advertise_address: "{{ hostvars[k3s_master_node].host_address }}"
 
 # k3s configuration
 k3s_kube_config: /etc/rancher/k3s/k3s.yaml

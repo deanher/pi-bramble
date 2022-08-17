@@ -1,0 +1,7 @@
+---
+- name: Write SSH config "{{ ssh_folder }}/config"
+  template:
+    src: "templates/ssh-config.j2"
+    dest: "{{ ssh_folder }}/config"
+  when: agents_group in group_names
+  run_once: true

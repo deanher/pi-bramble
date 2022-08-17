@@ -33,7 +33,7 @@
 
     - name: Set the master node IP.
       set_fact:
-        kubernetes_master_ip: "{{ hostvars[k3s_master_node].host_name }}"
+        kubernetes_master_ip: "{{ hostvars[k3s_master_node].host_address }}"
       tags: ["always"]
       when: "'agents' in group_names"
 
@@ -55,7 +55,6 @@
         name: deanh.k3s-manifests #geerlingguy.k8s_manifests
       tags: ['k3s', 'registry']
       when: "'servers' in group_names"
-      # delegate_to: "{{ k3s_master_node }}"
       run_once: true
       become: true
 

@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+    controller: "{{ groups.servers[0] }}"
+  
+  pre_tasks:
+    - name: Install dependencies
+      import_tasks: tasks/install-ansible-controller-deps.yml
+      delegate_to: localhost
+      tags: ["always"]
+
+  tasks:
+    - name: Prepare system for remote connections
+      import_role: 
+        name: deanh.ssh-setup
+      delegate_to: localhost
+      tags: ["always"]

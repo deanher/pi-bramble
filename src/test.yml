@@ -1,0 +1,29 @@
+- hosts: cluster
+  vars:
+    group: servers
+    agents_group: zeros
+    is_local: no
+  
+  tasks: 
+
+  - name: Set variable for hosts file
+    set_fact:
+      remote_hosts: "{{ [ 'master' ] + groups[agents_group] if is_local else groups[agents_group] }}"
+
+  - name: Foo
+    debug:
+      msg: "{{ hostvars[item].host_address }} {{ item }}"
+    loop: "{{ remote_hosts }}"
+    delegate_to: master
+    run_once: yes
+
+  - name: Foo
+    debug:
+      var: inventory_hostname
+    when: group in group_names
+
+  - name: Check file
+    file: 
+      path: setup/cluster-hat/templates/ssh-config.j2
+      state: file
+    delegate_to: localhost

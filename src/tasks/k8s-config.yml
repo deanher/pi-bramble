@@ -3,7 +3,7 @@
   lineinfile:
     path: "{{ k3s_kube_config }}"
     regexp: '127\.0\.0\.1'
-    line: "    server: https://{{ hostvars[inventory_hostname].host_name }}:6443"
+    line: "    server: https://{{ hostvars[inventory_hostname].host_address }}:6443"
     state: present
     owner: "{{ ansible_ssh_user }}"
     group: "{{ ansible_ssh_user }}"

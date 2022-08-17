@@ -1,0 +1,37 @@
+---
+- name: Generate SSH Key
+  expect:
+    command: ssh-keygen -t rsa -b 4096 -f {{ ssh_folder }}/id_rsa -q
+    responses:
+      "Overwrite": "n"
+    echo: no
+  failed_when: false
+  register: ssh_auth_key
+  no_log: true
+  run_once: true
+  
+- name: Setup auth keys
+  copy:
+    src: "{{ ssh_folder }}/id_rsa.pub"
+    dest: "{{ ssh_folder }}/authorized_keys"
+    remote_src: "{{ is_local }}"
+  when: 
+    - ssh_auth_key is changed
+    - agents_group in group_names
+  
+- name: Write SSH Configs
+  include_tasks: ssh-configs.yml
+  when: ssh_auth_key is changed
+
+- name: Set variable for hosts file
+  set_fact:
+    remote_hosts: "{{ [ controller ] + groups[agents_group] if is_local else groups[agents_group] }}"
+
+- name: Write /etc/hosts file
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item].host_address }} {{ item }}"
+    state: present
+  loop: "{{ remote_hosts }}"
+  become: true
+  run_once: true

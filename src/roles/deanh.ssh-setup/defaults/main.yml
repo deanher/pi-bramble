@@ -1,0 +1,4 @@
+---
+is_local: yes
+agents_group: agents
+controller: master
