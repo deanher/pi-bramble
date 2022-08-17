@@ -1,0 +1,38 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
+- name: Install sshpass locally
+  package:
+    update_cache: true
+    name: sshpass
+    state: latest
+  when: '"sshpass" not in ansible_facts.packages'
+  delegate_to: "{{ controller }}"
+  run_once: true
+  become: true
+
+- name: Generate SSH Key
+  shell: ssh-keygen -t rsa -b 4096
+  delegate_to: "{{ controller }}"
+  register: ssh_auth_key
+  no_log: true
+
+- name: Create .ssh directory
+  file:
+    path: "{{ ssh_folder }}"
+    state: directory
+
+- name: Setup auth keys
+  copy:
+    src: "{{ ssh_folder }}/id_rsa.pub"
+    dest: "{{ ssh_folder }}/authorized_keys"
+  delegate_to: "{{ controller }}"
+
+- name: Copy SSH config
+  template:
+    src: "setup/cluster-hat/templates/ssh-config.j2"
+    dest: "{{ ssh_folder }}/config"
+  when: "{{ controller == inventory_hostname }}"
+  run_once: true

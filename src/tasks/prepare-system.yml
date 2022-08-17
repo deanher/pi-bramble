@@ -14,8 +14,7 @@
   when: '"sshpass" not in ansible_facts.packages'
 
 - name: Extract local public key
-  shell: >
-    cat ~/.ssh/id_rsa.pub
+  shell: cat ~/.ssh/id_rsa.pub
   register: pubkey
   no_log: true
   delegate_to: localhost

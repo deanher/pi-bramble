@@ -1,26 +1,33 @@
 [cluster]
-masteri host_name=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
-p1 host_name=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
-; p2 host_name=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
-p3 host_name=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
-p4 host_name=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
-p5 host_name=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
-p6 host_name=192.168.178.66 docker_apt_arch=arm64 kubernetes_role=agent
-p7 host_name=192.168.178.67 docker_apt_arch=arm64 kubernetes_role=server
+master host_name=192.168.178.100 docker_apt_arch=arm64 kubernetes_role=server
+node01 host_name=192.168.178.101 docker_apt_arch=arm64 kubernetes_role=agent
+node02 host_name=192.168.178.102 docker_apt_arch=arm64 kubernetes_role=agent
+node03 host_name=192.168.178.103 docker_apt_arch=arm64 kubernetes_role=agent
+nodep1 host_name=172.019.181.001 docker_apt_arch=armhf kubernetes_role=agent
+nodep2 host_name=172.019.181.002 docker_apt_arch=armhf kubernetes_role=agent
+nodep3 host_name=172.019.181.003 docker_apt_arch=armhf kubernetes_role=agent
+nodep4 host_name=172.019.181.004 docker_apt_arch=armhf kubernetes_role=agent
 
 [servers]
-cbridge host_name=192.168.178.60 docker_apt_arch=arm64 kubernetes_role=server
-p7 host_name=192.168.178.67 docker_apt_arch=arm64 kubernetes_role=server
+master
 
 [agents]
-p1 host_name=192.168.178.61 docker_apt_arch=armhf kubernetes_role=agent
-p2 host_name=192.168.178.62 docker_apt_arch=armhf kubernetes_role=agent
-p3 host_name=192.168.178.63 docker_apt_arch=armhf kubernetes_role=agent
-p4 host_name=192.168.178.64 docker_apt_arch=armhf kubernetes_role=agent
-p5 host_name=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
+node01
+node02
+node03
+nodep1
+nodep2
+nodep3
+nodep4
+
+[zeros]
+nodep1
+nodep2
+nodep3
+nodep4
 
 [databases]
-p6 host_name=192.168.178.66 docker_apt_arch=arm64 kubernetes_role=agent
+nodep1
 
 [registries]
-p5 host_name=192.168.178.65 docker_apt_arch=arm64 kubernetes_role=agent
+nodep2
