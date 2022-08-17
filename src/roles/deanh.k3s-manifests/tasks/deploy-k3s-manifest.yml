@@ -1,0 +1,12 @@
+---
+- name: Deploy the resources defined inside the manifest to k3s.
+  template:
+    src: "{{ item }}"
+    dest: "{{ k3s_manifests_dir }}/{{manifest_directory_rel}}.yaml"
+    owner: root
+    group: root
+    mode: u=,g=,o=rw
+  loop: "{{ lookup(manifest_lookup_type, manifest_directory + '/manifest.yml', wantlist=True) }}"
+  no_log: "{{ k8s_no_log }}"
+  notify: restart k3s
+  become: true
