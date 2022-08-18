@@ -5,6 +5,27 @@
     is_local: no
   
   tasks: 
+  - name: Print the platform
+    apt:
+      name: apt-transport-https
+      state: present
+    check_mode: yes
+    failed_when: false
+    delegate_to: localhost
+    register: apt_available
+
+  - name: Print the result
+    debug:
+      msg: Sweet!
+    when: apt_available is search('apt must be installed') #"'apt must be installed' in apt_available"
+  
+  - name: Gather package facts
+    package_facts:
+      manager: apt
+
+  - name: Print the package facts
+    ansible.builtin.debug:
+      var: ansible_facts.packages[0][0].source
 
   - name: Set variable for hosts file
     set_fact:

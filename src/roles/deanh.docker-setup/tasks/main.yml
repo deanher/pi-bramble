@@ -1,0 +1,16 @@
+---
+- name: Check if apt is available
+  apt:
+    name: apt-transport-https
+    state: present
+  check_mode: yes
+  failed_when: false
+  register: apt_available
+
+- name: Install Docker and Compose using apt
+  include_tasks: docker-apt.yml
+  when: apt_available is search('apt must be installed')
+
+- name: Install Docker and Compose manually
+  include_tasks: docker-manual.yml
+  when: apt_available is not search('apt must be installed')

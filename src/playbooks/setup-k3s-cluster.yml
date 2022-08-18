@@ -1,0 +1,26 @@
+---
+- name: Setup k3s Cluster
+  hosts: cluster
+
+  pre_tasks:
+    - import_tasks: tasks/update-hosts.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/cgroup-features.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/setup-network.yml
+      when:
+        - ansible_distribution_version == "10"
+        - deploy_target != 'docker'
+      tags: ["always"]
+
+    - import_role:
+        name: deanh.docker-setup
+      # when: use_docker
+      tags: ["always"]
+
+    - import_role:
+        name: deanh.containerd-setup
+      # when: not use_docker
+      tags: ["always"]

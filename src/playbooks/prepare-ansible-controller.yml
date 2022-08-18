@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Prepare Ansible Controller
+  hosts: cluster
   vars:
     controller: "{{ groups.servers[0] }}"
   

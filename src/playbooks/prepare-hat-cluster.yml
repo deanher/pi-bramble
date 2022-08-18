@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Prepare ClusterHAT (CNAT)
+  hosts: cluster
   vars:
     is_local: no
     agents_group: zeros
