@@ -3,8 +3,20 @@
     group: servers
     agents_group: zeros
     is_local: no
-  
+
   tasks: 
+  - name: check file
+    block:
+    - name: 
+      file: 
+        path: "/etc/docker/certs.d/{{ docker_registry_domain }}/ca.crt"
+        state: file
+      # register: file_exists
+    rescue: 
+      - name: Print the result
+        debug:
+          msg: Sweeties!
+
   - name: Print the platform
     apt:
       name: apt-transport-https
