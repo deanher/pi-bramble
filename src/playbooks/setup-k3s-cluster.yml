@@ -36,9 +36,23 @@
       when: "'databases' in group_names"
       tags: ['k3s', 'database']
 
+    - include_role:
+        name: deanh.k3s
+      vars:
+        servers_groups_name: servers
+        agents_group_name: agents
+        # postgres_host: "{{ groups.databases[0] }}"
+
     - include_role: 
         name: deanh.k3s-docker-registry
       vars: 
         docker_registry_domain: registry.picluster.com
       when: "'servers' in group_names"
       tags: ['k3s', 'docker-registry']
+
+    - include_role: 
+        name: deanh.k3s-manifests
+      vars: 
+        docker_registry_domain: registry.picluster.com
+      when: "'servers' in group_names"
+      tags: ['k3s', 'manifests']

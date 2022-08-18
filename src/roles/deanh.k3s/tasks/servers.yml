@@ -6,3 +6,14 @@
     --datastore-endpoint "postgres://{{ postgres_user }}:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode={{ ssl_mode }}"
     --tls-san {{ hostvars[master_node].host_address }}
   become: true
+
+- name: Fix server IP in "k3s.yaml"
+  lineinfile:
+    path: "{{ kube_config }}"
+    regexp: '127\.0\.0\.1'
+    line: "    server: https://{{ hostvars[inventory_hostname].host_address }}:6443"
+    state: present
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+  become: true

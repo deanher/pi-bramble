@@ -1,16 +1,4 @@
 ---
-- name: Fix server IP in "k3s.yaml"
-  lineinfile:
-    path: "{{ k3s_kube_config }}"
-    regexp: '127\.0\.0\.1'
-    line: "    server: https://{{ hostvars[inventory_hostname].host_address }}:6443"
-    state: present
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
-    mode: '0644'
-  become: true
-  when: "'servers' in group_names"
-
 - name: Ensure ~/.kube directory exists.
   file:
     path: ~/.kube
@@ -21,7 +9,7 @@
 
 - name: Copy K8s config file from master to local.
   fetch:
-    src: "/etc/rancher/k3s/k3s.yaml"
+    src: "{{ kube_config }}"
     dest: "~/.kube/config-pi-cluster"
     flat: true
   delegate_to: "{{ master_node }}"

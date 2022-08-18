@@ -10,3 +10,5 @@ postgres_host: db_server_ip
 postgres_user: user
 postgres_password: password
 ssl_mode: disable
+
+kube_config: /etc/rancher/k3s/k3s.yaml

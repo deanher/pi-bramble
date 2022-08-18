@@ -24,3 +24,5 @@
 
 - include_tasks: agents.yml
   when: agents_group_name in group_names
+
+- include_tasks: configs.yml
