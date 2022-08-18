@@ -1,0 +1,22 @@
+---
+- name: Create "{{ registry_deployment_file }}"
+  file:
+    path: "{{ registry_deployment_file }}"
+    state: touch
+  become: true
+
+- name: Add registry to "{{ registry_deployment_file }}"
+  lineinfile:
+    path: "{{ registry_deployment_file }}"
+    line: "mirrors:"
+  become: true
+
+- name: Add registry to "{{ registry_deployment_file }}"
+  blockinfile:
+    path: "{{ registry_deployment_file }}"
+    block: |
+        {{ docker_registry_domain }}:
+          endpoint:
+            - "https://{{ docker_registry_domain }}:5000"
+    insertafter: "mirrors:"
+  become: true
