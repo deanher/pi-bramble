@@ -16,6 +16,10 @@
       - name: Print the result
         debug:
           msg: Sweeties!
+  
+  - name: Meh
+    debug:
+      msg: "{{ hostvars[groups[group][0]].host_address }}"
 
   - name: Print the platform
     apt:

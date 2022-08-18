@@ -1,0 +1,7 @@
+---
+- name: Setup k3s agents
+  shell: >
+    sh "/home/{{ ansible_ssh_user }}/k3s_install.sh" agent 
+    --token {{ k3s_token }}
+    --server "https://{{ hostvars[master_node].host_address }}:6443"
+  become: true

@@ -1,0 +1,12 @@
+---
+servers_group_name: servers
+agents_group_name: agents
+
+# security
+k3s_token: token
+
+# postgres
+postgres_host: db_server_ip
+postgres_user: user
+postgres_password: password
+ssl_mode: disable
