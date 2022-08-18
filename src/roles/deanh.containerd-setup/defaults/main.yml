@@ -1,0 +1,7 @@
+---
+# containerd
+containerd_config_default_write: true
+# Only use with containerd_config_default_write: true
+containerd_config_cgroup_driver_systemd: false
+containerd_service_state: started
+containerd_service_enabled: false
