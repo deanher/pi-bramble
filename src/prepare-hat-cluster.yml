@@ -1,6 +1,8 @@
 ---
 - name: Prepare ClusterHAT (CNAT)
   hosts: cluster
+  vars_files: 
+    - vars/secret.yml
   vars:
     is_local: no
     agents_group: zeros

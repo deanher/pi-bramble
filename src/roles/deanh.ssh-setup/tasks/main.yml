@@ -9,6 +9,11 @@
   register: ssh_auth_key
   no_log: true
   run_once: true
+
+- name: Create .ssh directory
+  file:
+    path: "{{ ssh_folder }}"
+    state: directory
   
 - name: Setup auth keys
   copy:

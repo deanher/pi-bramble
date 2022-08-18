@@ -4,16 +4,17 @@
     manager: auto
 
 - name: Install "git"
-  apt:
-    update_cache: true
+  package:
+    # update_cache: true
     name: git
     state: latest
   register: git_installed
+  run_once: true
   become: true
 
 - name: Install sshpass
   package:
-    update_cache: true
+    # update_cache: true
     name: sshpass
     state: latest
   when: '"sshpass" not in ansible_facts.packages'
@@ -40,6 +41,7 @@
   pip:
     name: openshift
   when: (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+  run_once: true
   become: true
 
 - name: Install "fabric" pip plugin
@@ -47,10 +49,12 @@
     name: fabric
   when:
     - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+  run_once: true
   become: true
 
-- name: Update apt cache and do full-upgrade
-  apt:
-    update_cache: true
-    upgrade: full
-  become: true
+# - name: Update apt cache and do full-upgrade
+#   package:
+#     update_cache: true
+#     # upgrade: full
+#   run_once: true
+#   become: true

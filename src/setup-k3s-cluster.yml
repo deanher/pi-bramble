@@ -1,10 +1,12 @@
 ---
 - name: Setup k3s Cluster
   hosts: cluster
+  vars_files: 
+    - vars/secret.yml
 
   pre_tasks:
-    - import_tasks: tasks/update-hosts.yml
-      tags: ["always"]
+    # - import_tasks: tasks/update-hosts.yml
+    #   tags: ["always"]
 
     - import_tasks: tasks/cgroup-features.yml
       tags: ["always"]
