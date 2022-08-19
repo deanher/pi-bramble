@@ -12,6 +12,9 @@
     line: "{{ certs_base_dir }}/"
     dest: "{{ certs_base_dir }}/.gitignore"
     create: true
+  connection: local
+  become: false
+  run_once: true
 
 - name: Check if Docker Registry cert already exists.
   stat:
