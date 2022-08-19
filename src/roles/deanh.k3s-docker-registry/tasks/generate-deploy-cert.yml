@@ -1,7 +1,7 @@
 ---
 - name: Create certs directory
   file:
-    path: "{{ certs_base_dir }}"
+    path: "{{ certs_base_dir }}/docker-registry"
     state: directory
   connection: local
   run_once: true

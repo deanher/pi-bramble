@@ -6,5 +6,5 @@
   include_tasks: generate-deploy-cert.yml
 
 - name: Deploy docker-registry manifest
-  include_tasks: docker-registry-manifest.yml
+  include_tasks: deploy-manifest.yml
   
