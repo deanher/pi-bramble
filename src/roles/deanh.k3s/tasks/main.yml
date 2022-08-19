@@ -16,7 +16,7 @@
     mode: '0644'
 
 - name: Set facts
-  set_facts:
+  set_fact:
     master_node: "{{ groups[servers_group_name][0] }}"
 
 - include_tasks: servers.yml

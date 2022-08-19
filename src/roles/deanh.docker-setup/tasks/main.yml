@@ -9,8 +9,8 @@
 
 - name: Install Docker and Compose using apt
   include_tasks: docker-apt.yml
-  when: apt_available is search('apt must be installed')
+  when: apt_available is not search('apt must be installed')
 
 - name: Install Docker and Compose manually
   include_tasks: docker-manual.yml
-  when: apt_available is not search('apt must be installed')
+  when: apt_available is search('apt must be installed')

@@ -3,7 +3,7 @@
   expect:
     command: ssh-keygen -t rsa -b 4096 -f {{ ssh_src_folder }}/id_rsa -q
     responses:
-      'Overwrite \(y/n\)?': 'y'
+      'Overwrite \(y/n\)?': 'n'
       'passphrase': ''
       'again': ''
     echo: yes
@@ -17,16 +17,72 @@
   file:
     path: "{{ ssh_folder }}"
     state: directory
-  
-- name: Setup auth keys
-  copy:
-    src: "{{ ssh_src_folder }}/id_rsa.pub"
-    dest: "{{ ssh_folder }}/authorized_keys"
-    remote_src: "{{ not is_local }}"
+
+- name: Extract local public key
+  shell: "cat {{ ssh_src_folder }}/id_rsa.pub"
+  register: public_key
+  no_log: true
+  delegate_to: localhost
+  check_mode: false
   when: 
+    - is_local
+    - ssh_auth_key is changed
+  run_once: true
+
+- name: Add local public key to authorized_keys
+  lineinfile:
+    path: "{{ ssh_folder }}/authorized_keys"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ public_key.stdout_lines }}"
+  when: 
+    - is_local
+    - ssh_auth_key is changed
+  no_log: true
+
+- name: Extract "{{ controller }}" public key
+  shell: "cat {{ ssh_src_folder }}/id_rsa.pub"
+  register: public_key
+  no_log: true
+  delegate_to: "{{ controller }}"
+  check_mode: false
+  when: 
+    - not is_local
+    - ssh_auth_key is changed
+  run_once: true
+
+- name: Add "{{ controller }}" public key to authorized_keys
+  lineinfile:
+    path: "{{ ssh_folder }}/authorized_keys"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ public_key.stdout_lines }}"
+  when: 
+    - not is_local
     - ssh_auth_key is changed
     - agents_group in group_names
-  delegate_to: "{{ is_local | ternary('localhost', controller) }}"
+  no_log: true
+  
+# - name: Copy auth keys
+#   copy:
+#     src: "{{ ssh_src_folder }}/id_rsa.pub"
+#     dest: "{{ ssh_folder }}/authorized_keys"
+#   when: 
+#     - is_local
+#     - ssh_auth_key is changed
+  
+# - name: Copy auth keys
+#   copy:
+#     src: "{{ ssh_src_folder }}/id_rsa.pub"
+#     dest: "{{ ssh_folder }}/authorized_keys"
+#     remote_src: yes
+#   when: 
+#     - not is_local
+#     - ssh_auth_key is changed
+#     - agents_group in group_names
+#   delegate_to: "{{ controller }}"
   
 - name: Write SSH Configs
   include_tasks: ssh-configs.yml
@@ -38,7 +94,7 @@
 - name: Write /etc/hosts file
   lineinfile:
     path: /etc/hosts
-    line: "{{ '{:<15} {}'.format((inventory_hostname == item) | ternary('127.0.1.1', hostvars[item].host_address), item) }}"
+    line: "{{ '{:<15} {}'.format(hostvars[item].host_address, item) }}"
     state: present
   loop: "{{ remote_hosts }}"
   become: true

@@ -8,7 +8,9 @@
 
   tasks: 
   - name: Foo
-    
+    debug:
+      msg: "Fooing"
+    when: (not is_local | ternary(agents_group, 'groups[')) in group_names
   - name: check file
     block:
     - name: 

@@ -7,10 +7,11 @@
     is_local: false
     agents_group: zeros
     controller: "{{ groups.servers[0] }}"
+    ssh_src_folder: /home/pi/.ssh
   
   pre_tasks:
-    - name: Gather facts for playbook
-      setup:
+    # - name: Gather facts for playbook
+    #   setup:
 
   #   - name: Install dependencies
   #     import_tasks: tasks/install-ansible-controller-deps.yml
