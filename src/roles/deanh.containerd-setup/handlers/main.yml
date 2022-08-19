@@ -3,4 +3,5 @@
   service:
     name: containerd
     state: restarted
+  failed_when: false
   listen: "restart containerd"

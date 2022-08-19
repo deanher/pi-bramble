@@ -40,6 +40,7 @@
 
 - name: Ensure docker and compose is installed.
   apt:
+    update_cache: true
     name:
       - docker-ce 
       - docker-ce-cli 
