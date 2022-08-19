@@ -11,6 +11,7 @@
   lineinfile: 
     line: "{{ certs_base_dir }}/"
     dest: "{{ certs_base_dir }}/.gitignore"
+    create: true
 
 - name: Check if Docker Registry cert already exists.
   stat:
