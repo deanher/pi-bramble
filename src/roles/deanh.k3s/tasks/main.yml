@@ -7,13 +7,13 @@
     follow: true
   run_once: true
 
-- name: Copy k3s installer to hosts
-  copy:
-    src: "~/k3s-install.sh"
-    dest: "/home/{{ ansible_ssh_user }}/k3s_install.sh"
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
-    mode: '0644'
+# - name: Copy k3s installer to hosts
+#   copy:
+#     src: "~/k3s-install.sh"
+#     dest: "/home/{{ ansible_ssh_user }}/k3s_install.sh"
+#     owner: "{{ ansible_ssh_user }}"
+#     group: "{{ ansible_ssh_user }}"
+#     mode: '0644'
 
 - name: Set facts
   set_fact:
