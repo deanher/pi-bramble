@@ -1,4 +1,17 @@
 ---
+- name: Create certs directory
+  file:
+    path: "{{ certs_base_dir }}"
+    state: directory
+  connection: local
+  run_once: true
+  become: false
+
+- name: gitignore the "{{ certs_base_dir }}"
+  lineinfile: 
+    line: "{{ certs_base_dir }}/"
+    dest: "{{ certs_base_dir }}/.gitignore"
+
 - name: Check if Docker Registry cert already exists.
   stat:
     path: "{{ certs_base_dir }}/docker-registry/tls.crt"
