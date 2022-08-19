@@ -1,4 +1,7 @@
 ---
-is_local: yes
+is_local: true
 agents_group: agents
 controller: master
+
+ssh_folder: /home/pi/.ssh
+ssh_src_folder: /home/dean/.ssh

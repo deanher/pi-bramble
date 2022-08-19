@@ -5,6 +5,8 @@
     - vars/secret.yml
 
   pre_tasks:
+    - name: Gather facts for playbook
+      gather_facts:
     # - import_tasks: tasks/update-hosts.yml
     #   tags: ["always"]
 

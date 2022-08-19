@@ -1,14 +1,17 @@
 ---
 - name: Generate SSH Key
   expect:
-    command: ssh-keygen -t rsa -b 4096 -f {{ ssh_folder }}/id_rsa -q
+    command: ssh-keygen -t rsa -b 4096 -f {{ ssh_src_folder }}/id_rsa -q
     responses:
-      "Overwrite": "n"
-    echo: no
+      'Overwrite \(y/n\)?': 'y'
+      'passphrase': ''
+      'again': ''
+    echo: yes
   failed_when: false
   register: ssh_auth_key
-  no_log: true
+  no_log: false
   run_once: true
+  delegate_to: "{{ is_local | ternary('localhost', controller) }}"
 
 - name: Create .ssh directory
   file:
@@ -17,16 +20,16 @@
   
 - name: Setup auth keys
   copy:
-    src: "{{ ssh_folder }}/id_rsa.pub"
+    src: "{{ ssh_src_folder }}/id_rsa.pub"
     dest: "{{ ssh_folder }}/authorized_keys"
-    remote_src: "{{ is_local }}"
+    remote_src: "{{ not is_local }}"
   when: 
     - ssh_auth_key is changed
     - agents_group in group_names
+  delegate_to: "{{ is_local | ternary('localhost', controller) }}"
   
 - name: Write SSH Configs
   include_tasks: ssh-configs.yml
-  when: ssh_auth_key is changed
 
 - name: Set variable for hosts file
   set_fact:
@@ -35,8 +38,9 @@
 - name: Write /etc/hosts file
   lineinfile:
     path: /etc/hosts
-    line: "{{ hostvars[item].host_address }} {{ item }}"
+    line: "{{ '{:<15} {}'.format((inventory_hostname == item) | ternary('127.0.1.1', hostvars[item].host_address), item) }}"
     state: present
   loop: "{{ remote_hosts }}"
   become: true
   run_once: true
+  delegate_to: "{{ is_local | ternary('localhost', controller) }}"

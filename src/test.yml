@@ -1,10 +1,14 @@
 - hosts: cluster
+  vars_files: 
+    - vars/secret.yml
   vars:
     group: servers
     agents_group: zeros
-    is_local: no
+    is_local: false
 
   tasks: 
+  - name: Foo
+    
   - name: check file
     block:
     - name: 
