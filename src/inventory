@@ -15,10 +15,6 @@ master
 node01
 node02
 node03
-nodep1
-nodep2
-nodep3
-nodep4
 
 [zeros]
 nodep1
@@ -30,4 +26,4 @@ nodep4
 nodep1
 
 [registries]
-nodep2
+node01
