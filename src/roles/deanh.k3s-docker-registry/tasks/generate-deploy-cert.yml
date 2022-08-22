@@ -29,8 +29,8 @@
     openssl req -x509 -nodes -days 3650 -newkey rsa:2048
     -keyout {{ certs_base_dir }}/docker-registry/tls.key
     -out {{ certs_base_dir }}/docker-registry/tls.crt
-    -subj "/CN={{ docker_registry_domain}}"
-    -addext "subjectAltName=DNS:{{ docker_registry_domain}}"
+    -subj "/CN={{ docker_registry_domain }}"
+    -addext "subjectAltName=DNS:{{ docker_registry_domain }}"
   connection: local
   become: false
   run_once: true
@@ -61,4 +61,23 @@
   copy:
     src: "{{ certs_base_dir }}/docker-registry/tls.crt"
     dest: "/etc/docker/certs.d/{{ docker_registry_domain }}/ca.crt"
+  become: true
+
+
+- name: Ensure system cert store directory exists.
+  file:
+    path: "/usr/local/share/ca-certificates/{{ docker_registry_domain }}/"
+    state: directory
+    recurse: true
+  become: true
+
+- name: Copy Docker Registry cert into system cert store.
+  copy:
+    src: "{{ certs_base_dir }}/docker-registry/tls.crt"
+    dest: "/usr/local/share/ca-certificates/{{ docker_registry_domain }}/ca.crt"
+  become: true
+
+- name: Update CA Certificates
+  shell: update-ca-certificates
+  notify: restart k3s
   become: true
