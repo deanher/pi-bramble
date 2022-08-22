@@ -32,11 +32,11 @@
     - import_tasks: tasks/cgroup-features.yml
       tags: ["always"]
 
-    - import_tasks: tasks/setup-network.yml
-      when:
-        - ansible_distribution_version == "10"
-        - deploy_target != 'docker'
-      tags: ["always"]
+    # - import_tasks: tasks/setup-network.yml
+    #   when:
+    #     - ansible_distribution_version == "11"
+    #     - deploy_target != 'docker'
+    #   tags: ["always"]
 
     - import_role:
         name: deanh.docker-setup
@@ -70,12 +70,13 @@
         name: deanh.k3s-docker-registry
       vars: 
         docker_registry_domain: registry.picluster.com
+        manifest_namespace: registry
       when: "'servers' in group_names"
       tags: ['k3s', 'docker-registry']
 
-    - include_role: 
-        name: deanh.k3s-manifests
-      vars: 
-        docker_registry_domain: registry.picluster.com
-      when: "'servers' in group_names"
-      tags: ['k3s', 'manifests']
+    # - include_role: 
+    #     name: deanh.k3s-manifests
+    #   vars: 
+    #     docker_registry_domain: registry.picluster.com
+    #   when: "'servers' in group_names"
+    #   tags: ['k3s', 'manifests']

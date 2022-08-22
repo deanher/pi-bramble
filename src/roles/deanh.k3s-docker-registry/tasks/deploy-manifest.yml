@@ -6,6 +6,6 @@
     owner: root
     group: root
     mode: u=,g=,o=rw
-  no_log: true
+  no_log: false
   notify: restart k3s
   become: true
