@@ -9,7 +9,7 @@
 
 - name: gitignore the "{{ certs_base_dir }}"
   lineinfile: 
-    line: "{{ certs_base_dir }}/"
+    line: "**/*"
     dest: "{{ certs_base_dir }}/.gitignore"
     create: true
   connection: local
@@ -44,10 +44,9 @@
 - name: Add registry to hosts file.
   lineinfile:
     dest: /etc/hosts
-    line: "{{ hostvars[docker_registry_ingress_host].host_address }}  {{ docker_registry_domain }}"
+    line: "{{ '{:<15} {}'.format(hostvars[docker_registry_ingress_host].host_address, docker_registry_domain) }}"
     regexp: '.*{{ docker_registry_domain }}$'
     state: present
-  when: deploy_target != 'docker'
   become: true
 
 - name: Ensure Docker cert store directory exists.
@@ -62,7 +61,6 @@
     src: "{{ certs_base_dir }}/docker-registry/tls.crt"
     dest: "/etc/docker/certs.d/{{ docker_registry_domain }}/ca.crt"
   become: true
-
 
 - name: Ensure system cert store directory exists.
   file:

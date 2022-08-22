@@ -10,9 +10,6 @@
     ssh_src_folder: /home/pi/.ssh
   
   pre_tasks:
-    # - name: Gather facts for playbook
-    #   setup:
-
   #   - name: Install dependencies
   #     import_tasks: tasks/install-ansible-controller-deps.yml
   #     delegate_to: "{{ controller }}"
@@ -22,5 +19,4 @@
     - name: Prepare system for remote connections
       import_role: 
         name: deanh.ssh-setup
-      # delegate_to: "{{ controller }}"
       tags: ["always"]

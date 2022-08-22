@@ -1,13 +1,16 @@
 ---
+#for multiple servers add: --datastore-endpoint "postgres://{{ postgres_user }}:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode={{ ssl_mode }}"
 - name: Setup k3s servers 
   shell: >
     curl -sfL https://get.k3s.io | sh -s - server 
     --token {{ k3s_token }}
     --tls-san {{ hostvars[master_node].host_address }}
-  # script:
-  #   cmd: "~/k3s-install.sh server --token {{ k3s_token }} --tls-san {{ hostvars[master_node].host_address }}"
   become: true
-#for multiple servers add: --datastore-endpoint "postgres://{{ postgres_user }}:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode={{ ssl_mode }}"
+
+# - name: Setup k3s servers 
+#   script:
+#     cmd: "~/k3s-install.sh server --token {{ k3s_token }} --tls-san {{ hostvars[master_node].host_address }}"
+#   become: true
 
 - name: Fix server IP in "k3s.yaml"
   lineinfile:

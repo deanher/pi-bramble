@@ -5,12 +5,6 @@
     state: touch
   become: true
 
-# - name: Add registry to "{{ registry_deployment_file }}"
-#   lineinfile:
-#     path: "{{ registry_deployment_file }}"
-#     line: "mirrors:"
-#   become: true
-
 - name: Add registry to "{{ registry_deployment_file }}"
   blockinfile:
     path: "{{ registry_deployment_file }}"
@@ -24,22 +18,4 @@
           tls:
             ca_file: /usr/local/share/ca-certificates/{{ docker_registry_domain }}/ca.crt
             insecure_skip_verify: true
-    # insertafter: "mirrors:"
   become: true
-
-# - name: Add registry configs to "{{ registry_deployment_file }}"
-#   lineinfile:
-#     path: "{{ registry_deployment_file }}"
-#     line: "configs:"
-#   become: true
-
-# - name: Add registry to "{{ registry_deployment_file }}"
-#   blockinfile:
-#     path: "{{ registry_deployment_file }}"
-#     block: |
-#         "{{ docker_registry_domain }}:5000":
-#           tls:
-#             ca_file: "/usr/local/share/ca-certificates/{{ docker_registry_domain }}/ca.crt"
-#             insecure_skip_verify: true
-#     insertafter: "configs:"
-#   become: true

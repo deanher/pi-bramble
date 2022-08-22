@@ -1,8 +1,4 @@
 ---
-- name: Check namespaces for k8s.
-  include_tasks: check-k8s.yml
-  when: use_k8s
-
 - name: Deploy manifests defined in manifests.
   include_tasks: deploy-manifest.yml
   loop: "{{ k8s_manifests }}"

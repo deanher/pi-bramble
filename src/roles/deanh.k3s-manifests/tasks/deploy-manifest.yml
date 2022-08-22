@@ -13,15 +13,6 @@
         - "{{ manifest_directory }}/vars.yml"
       skip: true
 
-- name: res
-  debug: msg="{{ item }}"
-  loop: "{{ lookup(manifest_lookup_type, manifest_directory + '/manifest.yml', wantlist=True) }}"
-
 - name: Deploy k3s manifests defined in manifests.
   include_tasks: deploy-k3s-manifest.yml
-  when: not use_k8s
-
-- name: Deploy k8s manifests defined in manifests.
-  include_tasks: deploy-k8s-manifest.yml
-  when: use_k8s
   

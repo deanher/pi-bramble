@@ -65,25 +65,6 @@
     - agents_group in group_names
   no_log: true
   
-# - name: Copy auth keys
-#   copy:
-#     src: "{{ ssh_src_folder }}/id_rsa.pub"
-#     dest: "{{ ssh_folder }}/authorized_keys"
-#   when: 
-#     - is_local
-#     - ssh_auth_key is changed
-  
-# - name: Copy auth keys
-#   copy:
-#     src: "{{ ssh_src_folder }}/id_rsa.pub"
-#     dest: "{{ ssh_folder }}/authorized_keys"
-#     remote_src: yes
-#   when: 
-#     - not is_local
-#     - ssh_auth_key is changed
-#     - agents_group in group_names
-#   delegate_to: "{{ controller }}"
-  
 - name: Write SSH Configs
   include_tasks: ssh-configs.yml
 

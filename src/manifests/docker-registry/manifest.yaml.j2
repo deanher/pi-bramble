@@ -1,4 +1,9 @@
 ---
+api Version: v1
+kind: Namespace
+metadata:
+name: {{ manifest_namespace }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,7 +32,7 @@ spec:
             - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
               value: "/var/lib/registry"
           ports:
-          - name: TCP
+          - name: tcp
             containerPort: 5000
           volumeMounts:
           - name: docker-registry-data
