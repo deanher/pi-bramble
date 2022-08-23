@@ -1,0 +1,120 @@
+---
+- hosts: servers
+  vars:
+    gitlab_url: https://gitlab.com/
+    runner_image: docker:20.10.16
+    agent_token:
+    agent_namespace: gitlab-runner
+    agent_image:
+    values_file_dir: "/home/{{ ansible_ssh_user }}/.gitlab-runner"
+  vars_files:
+    - vars/secret.yml
+  
+  tasks:
+
+    - name: Deploy gitlab-runner manifest
+      template:
+        src: "{{ playbook_dir }}/manifests/gitlab-runner/manifest.yaml.j2"
+        dest: /var/lib/rancher/k3s/server/manifests/gitlab-runner.yaml
+        force: yes
+      notify: restart k3s
+      become: true
+      when: "'servers' in group_names"
+
+    - name: Install "openshift & kubernetes" pip plugin
+      pip:
+        name: 
+          - kubernetes
+          - openshift
+      run_once: true
+      become: true
+      when: "'servers' in group_names"
+
+    - name: create namespace
+      shell: >
+        k3s kubectl apply -f ~/.gitlab-runner/create-namespace.yaml
+      # k8s:
+      #   apply: yes
+      #   definition: 
+      #     apiVersion: v1
+      #     kind: Namespace
+      #     metadata: 
+      #       name: "{{ agent_namespace }}"
+      #       labels:
+      #         name: "{{ agent_namespace }}"
+      #   kubeconfig: ~/.kube/config
+      when: "'servers' in group_names"
+        # state: present
+        # definition: "{{ lookup('file', 'manifests/gitlab-runner/namespace.yaml.j2') | from_yaml }}"
+
+    - name: create dir for values.yaml
+      file:
+        path: "{{ values_file_dir }}"
+        state: directory
+      when: "'servers' in group_names"
+    
+    - name: Create values.yml
+      copy:
+        content: |
+          gitlabUrl: {{ gitlab_url }}
+          runnerRegistrationToken: "{{ gitlab_runner_token }}"
+          concurrent: 5
+          rbac:
+            create: false
+            serviceAccountName: gitlab-runner:default
+          runners:
+            privileged: true
+            config: |
+              [[runners]]
+                [runners.kubernetes]
+                  image = "alpine"
+                  namespace = "{{ agent_namespace }}"
+                [runners.feature_flags]
+                  FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY=true
+                [runners.docker]
+                  image = "docker:20.10.16"
+                  volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+        dest: "{{ values_file_dir }}/values.yaml"
+        force: yes
+      register: values_file
+      when: "'servers' in group_names"
+    
+    - name: Create values2.yml
+      copy:
+        content: |
+          gitlabUrl: {{ gitlab_url }}
+          runnerRegistrationToken: "{{ gitlab_runner_token }}"
+          concurrent: 5
+          runners:
+            privileged: true
+            config: |
+              [[runners]]                  
+                name = "docker_build_runner"
+                [runners.docker]
+                  image = "docker:20.10.16"
+                  volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+        dest: "{{ values_file_dir }}/values.yaml"
+        force: yes
+      register: values2_file
+      when: "'servers' in group_names"
+        
+    - name: Deploy gitlab-runner using helm
+      shell: |
+        helm repo add gitlab https://charts.gitlab.io
+
+        helm repo update
+
+        helm install -f {{ values_file.dest }} --namespace {{ agent_namespace }} gitlab-runner gitlab/gitlab-runner
+      when: "'servers' in group_names"
+
+  handlers:
+    - name: Restart k3s
+      service:
+        name: k3s
+        state: restarted
+        # sleep: 5
+        delay: 5
+      # async: 1
+      poll: 20
+      failed_when: false
+      listen: "restart k3s"

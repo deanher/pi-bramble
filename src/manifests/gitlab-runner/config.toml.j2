@@ -1,0 +1,66 @@
+concurrent = 1
+check_interval = 10
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "local_docker_build_runner"
+  url = "https://gitlab.com/"
+  id = 17107176
+  token = "zeyaAvCt_LYg7ZTt-wPZ"
+  token_obtained_at = 2022-08-22T19:00:57Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:20.10.16"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+    shm_size = 0
+
+[[runners]]
+  name = "local_kube_runner"
+  url = "https://gitlab.com/"
+  id = 17110763
+  token = "jtJFs1LhDvq9RzALAYLA"
+  token_obtained_at = 2022-08-23T00:11:57Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "kubernetes"
+  [runners.feature_flags]
+    FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY=true
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.kubernetes]
+    host = ""
+    bearer_token_overwrite_allowed = false
+    image = "alpine"
+    namespace = "gitlab-runner"
+    namespace_overwrite_allowed = ""
+    pod_labels_overwrite_allowed = ""
+    service_account_overwrite_allowed = ""
+    pod_annotations_overwrite_allowed = ""
+    [runners.kubernetes.affinity]
+    [runners.kubernetes.pod_security_context]
+    [runners.kubernetes.init_permissions_container_security_context]
+      [runners.kubernetes.init_permissions_container_security_context.capabilities]
+    [runners.kubernetes.build_container_security_context]
+      [runners.kubernetes.build_container_security_context.capabilities]
+    [runners.kubernetes.helper_container_security_context]
+      [runners.kubernetes.helper_container_security_context.capabilities]
+    [runners.kubernetes.service_container_security_context]
+      [runners.kubernetes.service_container_security_context.capabilities]
+    [runners.kubernetes.volumes]
+    [runners.kubernetes.dns_config]
+    [runners.kubernetes.container_lifecycle]
