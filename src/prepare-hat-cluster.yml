@@ -9,7 +9,7 @@
     controller: "{{ groups.servers[0] }}"
     ssh_src_folder: /home/pi/.ssh
   
-  pre_tasks:
+  # pre_tasks:
   #   - name: Install dependencies
   #     import_tasks: tasks/install-ansible-controller-deps.yml
   #     delegate_to: "{{ controller }}"

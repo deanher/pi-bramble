@@ -43,6 +43,7 @@
         servers_groups_name: servers
         agents_group_name: agents
         # postgres_host: "{{ groups.databases[0] }}"
+      tags: ['k3s']
 
     - include_role: 
         name: deanh.k3s-docker-registry
@@ -55,7 +56,6 @@
     - include_role: 
         name: deanh.k3s-manifests
       vars: 
-        use_k8s: false
-        
+        use_k8s: false        
       when: "'servers' in group_names"
       tags: ['k3s', 'manifests']

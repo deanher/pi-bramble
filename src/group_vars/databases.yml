@@ -1,3 +1,4 @@
 ---
 postgres_folder: "/home/{{ ansible_ssh_user }}/.postgres"
 env_file_name: ".env"
+postgres_user: clusteruser
