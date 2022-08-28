@@ -3,7 +3,6 @@
   vars:
     gitlab_url: https://gitlab.com/
     runner_image: docker:20.10.16
-    agent_token:
     agent_namespace: gitlab-kube-runner
     agent_image:
     values_file_dir: "/home/{{ ansible_ssh_user }}/.gitlab-runner"

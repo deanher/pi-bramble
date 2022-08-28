@@ -24,7 +24,7 @@ check_interval = 10
     disable_entrypoint_overwrite = false
     oom_kill_disable = false
     disable_cache = false
-    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+    volumes = ["/home/pi/.config/buildkit:/srv/registry/buildkit", "/usr/local/share/ca-certificates/registry.picluster.com:/srv/registry/certs", "/var/run/docker.sock:/var/run/docker.sock", "/cache"]
     shm_size = 0
 
 [[runners]]
