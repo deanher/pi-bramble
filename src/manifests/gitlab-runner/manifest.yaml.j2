@@ -71,6 +71,10 @@ spec:
           volumeMounts:
             - mountPath: /home/gitlab-runner/.gitlab-runner
               name: gitlab-runner-config-new
+            - mountPath: /home/gitlab-runner/.config/buildkit
+              name: buildkit-config
+            - mountPath: /home/gitlab-runner/.config/buildkit/certs/registry.picluster.com
+              name: certs-config
             - mountPath: /etc/gitlab-runner
               name: gitlab-runner-config
             - mountPath: /var/run/docker.sock
@@ -81,6 +85,14 @@ spec:
           hostPath:
             path: /srv/gitlab-runner/config2
             type: DirectoryOrCreate
+        - name: buildkit-config
+          hostPath:
+            path: /home/{{ ansible_ssh_user }}/.config/buildkit
+            type: DirectoryOrCreate
+        - name: certs-config
+          hostPath:
+            path: /usr/local/share/ca-certificates/registry.picluster.com
+            type: Directory
         - name: gitlab-runner-config
           hostPath:
             path: /srv/gitlab-runner/config
