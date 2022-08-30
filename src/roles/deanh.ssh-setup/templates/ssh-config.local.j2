@@ -1,0 +1,41 @@
+{# Host master #}
+{#   Hostname 192.168.178.100 #}
+{#   User pi #}
+
+{# Host nodep1 #}
+{#   ProxyJump master #}
+{#   Hostname 172.19.181.1 #}
+{#   User pi #}
+
+{# Host nodep2 #}
+{#   ProxyJump master #}
+{#   Hostname 172.19.181.2 #}
+{#   User pi #}
+
+{# Host nodep3 #}
+{#   ProxyJump master #}
+{#   Hostname 172.19.181.3 #}
+{#   User pi #}
+
+{# Host nodep4 #}
+{#   ProxyJump master #}
+{#   Hostname 172.19.181.4 #}
+{#   User pi #}
+{% if is_local %}
+Host {{ controller }}
+  Hostname {{ hostvars[host].host_address }}
+  User {{ ansible_ssh_user }}
+{% end if %}
+
+{# Add an entry for each host in the cluster, using the loop index to map IPs #}
+{% for host in groups[agents_group] %}
+
+# Config for {{ host }}
+Host {{ host }} 
+  Hostname {{ hostvars[host].host_address }}
+  User {{ ansible_ssh_user }}
+  {% if is_local %}
+  ProxyJump {{ controller }}
+  {% end if %}
+
+{% endfor %}

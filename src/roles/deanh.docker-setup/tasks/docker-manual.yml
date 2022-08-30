@@ -1,0 +1,19 @@
+---
+- name: Add Docker from convenience script
+  shell: curl -fsSL https://get.docker.com | sudo sh -
+  args:
+    warn: false
+  become: true
+
+- name: Add Docker from convenience script
+  shell: |
+    DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+    
+    mkdir -p $DOCKER_CONFIG/cli-plugins
+    
+    curl -SL https://github.com/docker/compose/releases/tag/{{ docker_compose_version }}/docker-compose-linux-{{ docker_script_arch }} -o $DOCKER_CONFIG/cli-plugins/docker-compose
+    
+    chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+  args:
+    warn: false
+  become: true

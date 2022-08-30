@@ -1,0 +1,40 @@
+---
+- name: Create "{{ postgres_folder }}" directory
+  file:
+    path: "{{ postgres_folder }}"
+    state: directory
+
+- name: Copy the filled template to the db server
+  template:
+    src: "{{ playbook_dir }}/manifests/postgres/docker-compose.yml.j2"
+    dest: "{{ postgres_folder }}/docker-compose.yml"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: u=,g=,o=rwx
+  no_log: false
+  notify: restart k3s
+  become: true
+
+# - name: Create "{{ postgres_folder }}/{{ env_file_name }}" file
+#   file:
+#     path: "{{ postgres_folder }}/{{ env_file_name }}"
+#     state: touch
+
+# - name: Add environment variables to "{{ postgres_folder }}/{{ env_file_name }}"
+#   lineinfile:
+#     path: "{{ postgres_folder }}/{{ env_file_name }}"
+#     line: "POSTGRES_PASSWORD={{ postgres_password }}"
+#     state: present
+
+# - name: Create "{{ playbook_dir }}/manifests/postgres/docker-compose.yml" file
+#   copy:
+#     src: "{{ playbook_dir }}/manifests/postgres/docker-compose.yml"
+#     dest: "{{ postgres_folder }}/docker-compose.yml"
+
+- name: Compose postgres
+  shell: >
+    docker compose --project-name postgres
+    --env-file "{{ postgres_folder }}/{{ env_file_name }}"
+    -f "{{ postgres_folder }}/docker-compose.yml"
+    up -d
+  become: true

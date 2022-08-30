@@ -1,0 +1,72 @@
+- hosts: cluster
+  vars_files: 
+    - vars/secret.yml
+  vars:
+    group: servers
+    agents_group: zeros
+    is_local: false
+
+  tasks: 
+  - name: Foo
+    debug:
+      msg: "Fooing"
+    when: (not is_local | ternary(agents_group, 'groups[')) in group_names
+  - name: check file
+    block:
+    - name: 
+      file: 
+        path: "/etc/docker/certs.d/{{ docker_registry_domain }}/ca.crt"
+        state: file
+      # register: file_exists
+    rescue: 
+      - name: Print the result
+        debug:
+          msg: Sweeties!
+  
+  - name: Meh
+    debug:
+      msg: "{{ hostvars[groups[group][0]].host_address }}"
+
+  - name: Print the platform
+    apt:
+      name: apt-transport-https
+      state: present
+    check_mode: yes
+    failed_when: false
+    delegate_to: localhost
+    register: apt_available
+
+  - name: Print the result
+    debug:
+      msg: Sweet!
+    when: apt_available is search('apt must be installed') #"'apt must be installed' in apt_available"
+  
+  - name: Gather package facts
+    package_facts:
+      manager: apt
+
+  - name: Print the package facts
+    ansible.builtin.debug:
+      var: ansible_facts.packages[0][0].source
+
+  - name: Set variable for hosts file
+    set_fact:
+      remote_hosts: "{{ [ 'master' ] + groups[agents_group] if is_local else groups[agents_group] }}"
+
+  - name: Foo
+    debug:
+      msg: "{{ hostvars[item].host_address }} {{ item }}"
+    loop: "{{ remote_hosts }}"
+    delegate_to: master
+    run_once: yes
+
+  - name: Foo
+    debug:
+      var: inventory_hostname
+    when: group in group_names
+
+  - name: Check file
+    file: 
+      path: setup/cluster-hat/templates/ssh-config.j2
+      state: file
+    delegate_to: localhost

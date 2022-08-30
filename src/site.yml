@@ -1,0 +1,4 @@
+---
+- import_playbook: prepare-ansible-controller.yml
+- import_playbook: prepare-hat-cluster.yml
+- import_playbook: setup-k3s-cluster.yml

@@ -1,0 +1,10 @@
+---
+- name: Deploy docker-registry manifest
+  include_tasks: enable-registry.yml
+
+- name: Deploy registry cert
+  include_tasks: generate-deploy-cert.yml
+
+- name: Deploy docker-registry manifest
+  include_tasks: deploy-manifest.yml
+  

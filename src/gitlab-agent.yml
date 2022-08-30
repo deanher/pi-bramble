@@ -1,0 +1,112 @@
+---
+- hosts: servers
+  vars:
+    gitlab_url: https://gitlab.com/
+    runner_image: docker:20.10.16
+    agent_namespace: gitlab-kube-runner
+    agent_image:
+    values_file_dir: "/home/{{ ansible_ssh_user }}/.gitlab-runner"
+  vars_files:
+    - vars/secret.yml
+  
+  tasks:
+    - name: Deploy gitlab-runner manifest
+      template:
+        src: "{{ playbook_dir }}/manifests/gitlab-runner/manifest.yaml.j2"
+        dest: /var/lib/rancher/k3s/server/manifests/gitlab-runner.yaml
+        force: yes
+      notify: restart k3s
+      become: true
+      when: "'servers' in group_names"
+
+    - name: Deploy gitlab-runner manifest
+      template:
+        src: "{{ playbook_dir }}/manifests/gitlab-runner/namespace.yaml.j2"
+        dest: /var/lib/rancher/k3s/server/manifests/namespace.yaml
+        force: yes
+      notify: restart k3s
+      become: true
+      when: "'servers' in group_names"
+
+    - name: Deploy gitlab-runner manifest
+      template:
+        src: "{{ playbook_dir }}/manifests/gitlab-runner/{{ agent_namespace }}-namespace.yaml.j2"
+        dest: /var/lib/rancher/k3s/server/manifests/{{ agent_namespace }}-namespace.yaml
+        force: yes
+      notify: restart k3s
+      become: true
+      when: "'servers' in group_names"
+
+    - name: Install "openshift & kubernetes" pip plugin
+      pip:
+        name: 
+          - kubernetes
+          - openshift
+      run_once: true
+      become: true
+      when: "'servers' in group_names"
+
+    - name: create dir for values.yaml
+      file:
+        path: "{{ values_file_dir }}"
+        state: directory
+      when: "'servers' in group_names"
+    
+    - name: Create values.yml
+      copy:
+        content: |
+          gitlabUrl: {{ gitlab_url }}
+          runnerRegistrationToken: {{ gitlab_runner_token }}
+          concurrent: 1
+          rbac:
+            create: true
+            # serviceAccountName: {{ agent_namespace }}:default
+          runners:
+            tags: "kube_deploy_runner"
+            helpers:
+              image: gitlab/gitlab-runner-helper:arm64-latest
+            privileged: true
+            config: |
+              [[runners]]
+                name = "kube_deploy_runner"
+                [runners.kubernetes]
+                  image = "bitnami/kubectl"
+                  namespace = "{{ agent_namespace }}"
+                [runners.feature_flags]
+                  FF_USE_LEGACY_KUBERNETES_EXECUTION_STRATEGY=true
+          volumeMounts:
+            - mountPath: /home/{{ agent_namespace }}/.gitlab-runner
+              name: {{ agent_namespace }}-config
+            - mountPath: /var/run/docker.sock
+              name: {{ agent_namespace }}-docker
+          # nodeSelector:
+          #   node-role.kubernetes.io/worker: "true"
+          volumes:
+            - name: {{ agent_namespace }}-config
+              hostPath:
+                path: /srv/{{ agent_namespace }}/config
+                type: DirectoryOrCreate
+            - name: {{ agent_namespace }}-docker
+              hostPath:
+                path: /var/run/docker.sock
+        dest: "{{ values_file_dir }}/values.yaml"
+        force: yes
+      register: values_file
+      when: "'servers' in group_names"
+        
+    - name: Deploy "{{ agent_namespace }}"" using helm
+      shell: |
+        helm repo add gitlab https://charts.gitlab.io
+
+        helm repo update
+
+        helm install -f {{ values_file.dest }} --namespace {{ agent_namespace }} kube-deploy gitlab/gitlab-runner
+      when: "'servers' in group_names"
+
+  handlers:
+    - name: Restart k3s
+      systemd:
+        name: k3s
+        daemon_reload: yes
+        state: restarted
+      listen: "restart k3s"

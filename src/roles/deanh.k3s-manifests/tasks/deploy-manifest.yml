@@ -1,0 +1,18 @@
+---
+- name: Set variables for this iteration of the loop.
+  set_fact:
+    manifest_directory: "{{ k8s_manifests_base_dir }}{{ outer_item.dir | default(outer_item) }}"
+    manifest_directory_rel: "{{ outer_item.dir | default(outer_item) }}"
+    manifest_lookup_type: "{{ outer_item.lookup_type | default('fileglob') }}"
+    manifest_namespace: "{{ outer_item.namespace | default('') }}"
+
+- name: Include vars specific to this manifest.
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ manifest_directory }}/vars.yml"
+      skip: true
+
+- name: Deploy k3s manifests defined in manifests.
+  include_tasks: deploy-k3s-manifest.yml
+  

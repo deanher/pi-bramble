@@ -1,0 +1,13 @@
+---
+- name: Install "git"
+  apt:
+    name: git
+    state: latest
+  register: git_installed
+  become: true
+
+- name: Update apt cache and do full-upgrade
+  apt:
+    update_cache: true
+    upgrade: full
+  become: true

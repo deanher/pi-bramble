@@ -1,0 +1,44 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: false
+  tasks:
+  - name: get hostname
+    debug: msg="{{ groups.cluster[0] }}"
+    register: foo
+  - name: Test 2
+    debug: msg="{{ hostvars[foo.msg].ansible_host }}"
+  - name:
+    shell: "cat /proc/cpuinfo"
+    register: result
+  - name: print result
+    debug:
+      var: result
+  - name: dpkg --print-architecture
+    shell: "dpkg --print-architecture"
+    register: arch
+  - name: print arch
+    debug:
+      var: arch
+  # - name:
+  #   shell: "readelf -A /proc/self/exe | grep Tag_ABI_VFP_args"
+  #   register: elf
+  # - name: print elf
+  #   debug:
+  #     var: elf
+  - name: Architecture
+    debug: msg="{{ ansible_architecture }}"
+  - name: Distribution
+    debug: msg="{{ ansible_distribution | lower }}"
+  - name: Distribution version
+    debug: msg="{{ ansible_distribution_version}}"
+  - name: Distribution major version
+    debug: msg="{{ ansible_distribution_major_version }}"
+  - name: Distribution release version
+    debug: msg="{{ ansible_distribution_release }}"
+  - name: Distribution release version
+    debug: msg="{{ (ansible_architecture == 'aarch64') | ternary('arm64', 'armhf') }}"
+  - name: Distribution release version
+    debug: msg="deb [arch={{ (ansible_architecture == 'aarch64') | ternary('arm64', 'armhf') }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+  - name: Distribution 
+    debug: msg="deb [arch={{ (ansible_architecture == 'aarch64') | ternary('arm64', 'armhf') }}] https://download.docker.com/linux/{{ (ansible_architecture == 'aarch64') | ternary(ansible_distribution, 'Raspbian') | lower }} {{ ansible_distribution_release }} stable"

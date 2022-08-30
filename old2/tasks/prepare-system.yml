@@ -1,0 +1,89 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
+- name: Install sshpass locally
+  package:
+    update_cache: true
+    name: sshpass
+    state: latest
+  delegate_to: localhost
+  run_once: true
+  become: true
+  when: '"sshpass" not in ansible_facts.packages'
+
+- name: Extract local public key
+  shell: cat ~/.ssh/id_rsa.pub
+  register: pubkey
+  no_log: true
+  delegate_to: localhost
+  check_mode: false
+
+- name: Create .ssh directory
+  file:
+    path: "{{ ssh_folder }}"
+    state: directory
+
+- name: Create empty "authorized_keys" file
+  file:
+    path: "{{ ssh_folder }}/authorized_keys"
+    state: touch
+  register: auth_keys_created
+
+- name: Add public key to authorized_keys
+  lineinfile:
+    path: "{{ ssh_folder }}/authorized_keys"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ pubkey.stdout_lines }}"
+  when: not ansible_check_mode
+  no_log: true
+
+- name: Install "python3-pip"
+  apt:
+    update_cache: true
+    name: python3-pip
+    state: latest
+  register: python3_pip_installed
+  become: true
+
+- name: Install "git"
+  apt:
+    update_cache: true
+    name: git
+    state: latest
+  register: git_installed
+  become: true
+
+- name: Install "pexpect" pip plugin
+  pip:
+    name: pexpect
+  become: true
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Install "openshift" pip plugin
+  pip:
+    name: openshift
+  become: true
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Install "fabric" pip plugin
+  pip:
+    name: fabric
+  become: true
+  delegate_to: "{{ groups.servers[0] }}"
+  when:
+    - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+    - not ansible_check_mode
+
+- name: Update apt cache and do full-upgrade
+  apt:
+    update_cache: true
+    upgrade: full
+  become: true

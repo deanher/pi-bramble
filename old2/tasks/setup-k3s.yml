@@ -1,0 +1,33 @@
+---
+- name: Download k3s
+  local_action: 
+    module: get_url
+    url: https://get.k3s.io
+    dest: "~/k3s-install.sh"
+    follow: true
+  run_once: true
+
+- name: Copy k3s installer to hosts
+  copy:
+    src: "~/k3s-install.sh"
+    dest: "/home/{{ ansible_ssh_user }}/k3s_install.sh"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+
+- name: Setup k3s servers 
+  shell: >
+    sh "/home/{{ ansible_ssh_user }}/k3s_install.sh" server 
+    --token {{ k3s_token }} 
+    --datastore-endpoint "postgres://clusteruser:{{ postgres_password }}@{{ postgres_host }}:5432/k3s?sslmode=disable"
+    --tls-san {{ hostvars[k3s_master_node].host_address }}
+  when: "'servers' in group_names"
+  become: true
+
+- name: Setup k3s workers
+  shell: >
+    sh "/home/{{ ansible_ssh_user }}/k3s_install.sh" agent 
+    --token {{ k3s_token }}
+    --server "https://{{ hostvars[k3s_master_node].host_address }}:6443"
+  when: "'agents' in group_names"
+  become: true

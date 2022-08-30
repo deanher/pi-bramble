@@ -1,0 +1,95 @@
+---
+- hosts: cluster
+  vars_files: 
+    - secret.yml
+
+  tasks:
+  - name: Gather package facts
+    package_facts:
+      manager: auto
+  
+  - name: Install sshpass
+    package:
+      update_cache: true
+      name: sshpass
+      state: latest
+    when: '"sshpass" not in ansible_facts.packages'
+    delegate_to: "{{ groups.servers[0] }}"
+    run_once: true
+    become: true
+
+  - name: Install "python3-pip"
+    package:
+      name: python3-pip
+      state: latest
+    when: '"python3-pip" not in ansible_facts.packages'
+    register: python3_pip_installed
+    delegate_to: "{{ groups.servers[0] }}"
+    run_once: true
+    become: true
+  
+  - name: Install "pexpect" pip plugin
+    pip:
+      name: pexpect
+    when:
+      - (python3_pip_installed is changed) or (python3_pip_installed is succeeded)
+      - not ansible_check_mode
+    delegate_to: "{{ groups.servers[0] }}"
+    run_once: true
+    become: true
+  
+  - name: Generate SSH Key
+    expect:
+      command: ssh-keygen -t rsa -b 4096 -f {{ ssh_folder }}/id_rsa -q
+      responses:
+        "Overwrite": "y"
+        "passphrase": ""
+      echo: yes
+    delegate_to: "{{ groups.servers[0] }}"
+    register: ssh_auth_key
+    no_log: false
+    run_once: true
+  
+  - name: Create .ssh directory
+    file:
+      path: "{{ ssh_folder }}"
+      state: directory
+    when: ssh_auth_key is changed
+  
+  - name: Setup auth keys
+    copy:
+      src: "{{ ssh_folder }}/id_rsa.pub"
+      dest: "{{ ssh_folder }}/authorized_keys"
+      remote_src: yes
+    delegate_to: "{{ groups.servers[0] }}"
+    when: 
+      - ssh_auth_key is changed
+      - "'zeros' in group_names"
+  
+  - name: Setup auth keys
+    copy:
+      src: "/home/dean/.ssh/id_rsa.pub"
+      dest: "{{ ssh_folder }}/authorized_keys"
+    when: 
+      # - ssh_auth_key is changed
+      - "'servers' in group_names"
+  
+  - name: Copy SSH config
+    template:
+      src: "setup/cluster-hat/templates/ssh-config.j2"
+      dest: "{{ ssh_folder }}/config"
+    when: 
+      - "'zeros' in group_names"
+      - ssh_auth_key is changed
+    run_once: true
+
+  - name: Foo
+    debug:
+      var: ansible_ssh_common_args
+
+  - name: Ping
+    ping:
+
+  - name: Foo
+    shell: "echo {{ inventory_hostname }}"
+    when: "'master' == inventory_hostname"

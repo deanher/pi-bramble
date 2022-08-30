@@ -1,0 +1,18 @@
+---
+services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER={{ postgres_user }}
+      - POSTGRES_PASSWORD={{postgres_password}}
+    volumes:
+      - /home/pi/.postgres/data/:/var/lib/postgresql/data/
+    ports: 
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 9080:8080

@@ -1,0 +1,22 @@
+---
+- name: Prepare ClusterHAT (CNAT)
+  hosts: cluster
+  vars_files: 
+    - vars/secret.yml
+  vars:
+    is_local: false
+    agents_group: zeros
+    controller: "{{ groups.servers[0] }}"
+    ssh_src_folder: /home/pi/.ssh
+  
+  # pre_tasks:
+  #   - name: Install dependencies
+  #     import_tasks: tasks/install-ansible-controller-deps.yml
+  #     delegate_to: "{{ controller }}"
+  #     tags: ["always"]
+
+  tasks:
+    - name: Prepare system for remote connections
+      import_role: 
+        name: deanh.ssh-setup
+      tags: ["always"]

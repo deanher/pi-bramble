@@ -1,0 +1,11 @@
+---
+- name: Deploy the resources defined inside the manifest to k3s.
+  template:
+    src: templates/manifest.yaml.j2
+    dest: "{{ manifest_deployment_dir }}/docker-registry.yaml"
+    owner: root
+    group: root
+    mode: u=,g=,o=rw
+  no_log: false
+  notify: restart k3s
+  become: true

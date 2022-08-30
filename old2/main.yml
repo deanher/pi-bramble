@@ -1,0 +1,72 @@
+---
+- name: Go go go!
+  hosts: all
+  vars_files: 
+    - secret.yml
+
+  vars:
+    k8s_kubeconfig: /etc/rancher/k3s/k3s.yaml #~/.kube/config-pi-cluster
+    k8s_manage_namespace: false
+    k8s_no_log: false
+    k8s_manifests_base_dir: "manifests/"
+    k8s_manifests:
+      - dir: docker-registry
+        namespace: registry
+
+  pre_tasks:
+    - import_tasks: tasks/cgroup-features.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/prepare-system.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/setup-network.yml
+      when:
+        - ansible_distribution_version == "10"
+        - deploy_target != 'docker'
+
+    - import_tasks: tasks/setup-docker.yml
+      tags: ["always"]
+
+    - import_tasks: tasks/setup-containerd.yml
+      tags: ["always"]
+
+    - name: Set the master node IP.
+      set_fact:
+        kubernetes_master_ip: "{{ hostvars[k3s_master_node].host_address }}"
+      tags: ["always"]
+      when: "'agents' in group_names"
+
+  tasks:
+    - include_tasks: tasks/setup-external-database.yml
+      tags: ['k3s', 'database']
+      when: "'databases' in group_names"
+
+    - include_tasks: tasks/setup-docker-registry.yml
+      tags: ['k3s', 'registry']
+
+    - include_tasks: tasks/setup-k3s.yml
+      tags: ["k3s"]
+
+    - include_tasks: tasks/k8s-config.yml
+      tags: ['k3s']
+
+    - import_role:
+        name: deanh.k3s-manifests #geerlingguy.k8s_manifests
+      tags: ['k3s', 'registry']
+      when: "'servers' in group_names"
+      run_once: true
+      become: true
+
+  handlers:
+    - name: Restart containerd
+      service:
+        name: containerd
+        state: restarted
+      listen: "restart containerd"
+
+    - name: Restart k3s
+      service:
+        name: k3s
+        state: restarted
+      listen: "restart k3s"

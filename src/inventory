@@ -1,0 +1,29 @@
+[cluster]
+master host_address=192.168.178.100 docker_apt_arch=arm64 kubernetes_role=server
+node01 host_address=192.168.178.101 docker_apt_arch=arm64 kubernetes_role=agent
+node02 host_address=192.168.178.102 docker_apt_arch=arm64 kubernetes_role=agent
+node03 host_address=192.168.178.103 docker_apt_arch=arm64 kubernetes_role=agent
+nodep1 host_address=172.19.181.1 docker_apt_arch=armhf kubernetes_role=agent
+nodep2 host_address=172.19.181.2 docker_apt_arch=armhf kubernetes_role=agent
+nodep3 host_address=172.19.181.3 docker_apt_arch=armhf kubernetes_role=agent
+nodep4 host_address=172.19.181.4 docker_apt_arch=armhf kubernetes_role=agent
+
+[servers]
+master
+
+[agents]
+node01
+node02
+node03
+
+[zeros]
+nodep1
+nodep2
+nodep3
+nodep4
+
+[databases]
+nodep1
+
+[registries]
+node01

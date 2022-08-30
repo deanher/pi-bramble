@@ -1,0 +1,20 @@
+---
+- name: Prepare Ansible Controller
+  hosts: cluster
+  vars_files: 
+    - vars/secret.yml
+  vars:
+    controller: "{{ groups.servers[0] }}"
+    ssh_src_folder: /home/dean/.ssh
+  
+  pre_tasks:
+    - name: Install dependencies
+      import_tasks: tasks/install-ansible-controller-deps.yml
+      delegate_to: localhost
+      tags: ["always"]
+
+  tasks:
+    - name: Prepare system for remote connections
+      import_role: 
+        name: deanh.ssh-setup
+      tags: ["always"]

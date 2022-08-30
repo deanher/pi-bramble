@@ -1,0 +1,5 @@
+---
+registry_deployment_file: /etc/rancher/k3s/registries.yaml
+manifest_deployment_dir: /var/lib/rancher/k3s/server/manifests
+docker_registry_domain: registry.example.com
+certs_base_dir: "{{ playbook_dir }}/certs"

@@ -1,0 +1,21 @@
+---
+- name: Create "{{ registry_deployment_file }}"
+  file:
+    path: "{{ registry_deployment_file }}"
+    state: touch
+  become: true
+
+- name: Add registry to "{{ registry_deployment_file }}"
+  blockinfile:
+    path: "{{ registry_deployment_file }}"
+    block: |
+      mirrors:
+        {{ docker_registry_domain }}:
+          endpoint:
+            - "https://{{ docker_registry_domain }}:5000"
+      configs:
+        "{{ docker_registry_domain }}:5000":
+          tls:
+            ca_file: /usr/local/share/ca-certificates/{{ docker_registry_domain }}/ca.crt
+            insecure_skip_verify: true
+  become: true

@@ -1,0 +1,11 @@
+---
+- name: Cleanup temporary file
+  file:
+    path: /tmp/containerd_config.toml
+    state: absent
+  changed_when: false
+  become: true
+
+- name: Ensure containerd is restarted immediately if necessary.
+  meta: flush_handlers
+  become: true

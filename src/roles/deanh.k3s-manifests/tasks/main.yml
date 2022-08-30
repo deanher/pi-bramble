@@ -1,0 +1,6 @@
+---
+- name: Deploy manifests defined in manifests.
+  include_tasks: deploy-manifest.yml
+  loop: "{{ k8s_manifests }}"
+  loop_control:
+    loop_var: outer_item

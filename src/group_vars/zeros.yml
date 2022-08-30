@@ -1,0 +1,4 @@
+---
+# ansible_ssh_common_args: "-o PasswordAuthentication=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand='ssh -J {{ ansible_ssh_user }}@{{ groups.servers[0] }}'"
+
+controller: "{{ groups.servers[0] }}"

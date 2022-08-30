@@ -1,0 +1,61 @@
+---
+- name: Setup k3s Cluster
+  hosts: cluster
+  vars:
+    delete_old_keys: true
+  vars_files: 
+    - vars/secret.yml
+
+  pre_tasks:
+    - import_tasks: tasks/cgroup-features.yml
+      tags: ["always"]
+
+    # - import_tasks: tasks/setup-network.yml
+    #   when:
+    #     - ansible_distribution_version == "11"
+    #     - deploy_target != 'docker'
+    #   tags: ["always"]
+
+    - import_role:
+        name: deanh.docker-setup
+      # when: use_docker
+      tags: ["always", "docker"]
+
+    - import_role:
+        name: deanh.containerd-setup
+      # when: not use_docker
+      tags: ["always", "containerd"]
+
+    - name: Set the master node IP.
+      set_fact:
+        kubernetes_master_ip: "{{ hostvars[k3s_master_node].host_address }}"
+      when: "'agents' in group_names"
+      tags: ["always"]
+
+  tasks:
+    - include_tasks: tasks/setup-external-database.yml
+      when: "'databases' in group_names"
+      tags: ['k3s', 'database']
+
+    - include_role:
+        name: deanh.k3s
+      vars:
+        servers_groups_name: servers
+        agents_group_name: agents
+        # postgres_host: "{{ groups.databases[0] }}"
+      tags: ['k3s']
+
+    - include_role: 
+        name: deanh.k3s-docker-registry
+      vars: 
+        docker_registry_domain: registry.picluster.com
+        manifest_namespace: registry
+      when: "'servers' in group_names"
+      tags: ['k3s', 'docker-registry']
+
+    - include_role: 
+        name: deanh.k3s-manifests
+      vars: 
+        use_k8s: false        
+      when: "'servers' in group_names"
+      tags: ['k3s', 'manifests']

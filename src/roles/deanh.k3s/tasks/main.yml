@@ -1,0 +1,28 @@
+---
+- name: Download k3s
+  local_action: 
+    module: get_url
+    url: https://get.k3s.io
+    dest: "~/k3s-install.sh"
+    follow: true
+  run_once: true
+
+# - name: Copy k3s installer to hosts
+#   copy:
+#     src: "~/k3s-install.sh"
+#     dest: "/home/{{ ansible_ssh_user }}/k3s_install.sh"
+#     owner: "{{ ansible_ssh_user }}"
+#     group: "{{ ansible_ssh_user }}"
+#     mode: '0644'
+
+- name: Set facts
+  set_fact:
+    master_node: "{{ groups[servers_group_name][0] }}"
+
+- include_tasks: servers.yml
+  when: servers_group_name in group_names
+
+- include_tasks: agents.yml
+  when: agents_group_name in group_names
+
+- include_tasks: configs.yml

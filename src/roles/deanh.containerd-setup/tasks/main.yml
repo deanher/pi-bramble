@@ -1,0 +1,30 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
+- name: Setup containerd
+  apt:
+    name: containerd.io
+    state: latest
+  when: not ansible_check_mode
+  become: true
+
+- name: Ensure containerd is started and enabled at boot.
+  service:
+    name: containerd
+    state: "{{ containerd_service_state }}"
+    enabled: "{{ containerd_service_enabled }}"
+  become: true
+
+# DHE: will be installed later
+# - name: Install "nerdctl"
+#   shell: >
+#     brew install nerdctl
+#   when: "'servers' in group_names"
+
+- import_tasks: containerd-config.yml
+  tags: ['config']
+
+- import_tasks: post-setup.yml
+  tags: ['cleanup']

@@ -1,0 +1,3 @@
+---
+# groups variables for servers
+postgres_host: "{{ groups.databases[0] }}"

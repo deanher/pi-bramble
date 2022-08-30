@@ -1,0 +1,43 @@
+---
+- name: Fix server IP in "k3s.yaml"
+  lineinfile:
+    path: "{{ k3s_kube_config }}"
+    regexp: '127\.0\.0\.1'
+    line: "    server: https://{{ hostvars[inventory_hostname].host_address }}:6443"
+    state: present
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+  become: true
+  when: "'servers' in group_names"
+
+- name: Ensure ~/.kube directory exists.
+  file:
+    path: ~/.kube
+    state: directory
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Copy K8s config file from master to local.
+  fetch:
+    src: "/etc/rancher/k3s/k3s.yaml"
+    dest: "~/.kube/config-pi-cluster"
+    flat: true
+  delegate_to: "{{ master_node }}"
+  run_once: true
+  become: true
+
+- name: Ensure ~/.kube directory exists.
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: Copy K8s config file from master to nodes.
+  copy:
+    src: "~/.kube/config-pi-cluster"
+    dest: "/home/{{ ansible_ssh_user }}/.kube/config"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+  become: true
